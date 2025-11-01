@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        {% if user.role == 'manager' %}
+            Все заказы
+        {% else %}
+            Мои заказы
+        {% endif %}
+    </h2>
+    {% if user.role == 'client' %}
+    <a href="{% url 'order_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Создать заказ
+    </a>
+    {% endif %}
+</div>
+
+{% if orders %}
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>№</th>
+                <th>Тип изделия</th>
+                <th>Тип заказа</th>
+                <th>Клиент</th>
+                <th>Статус</th>
+                <th>Бюджет</th>
+                <th>Создан</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.order_id }}</strong></td>
+                <td>
+                    {% if order.product_type == 'ring' %}💍 Кольцо
+                    {% elif order.product_type == 'brooch' %}🌸 Брошь
+                    {% elif order.product_type == 'bracelet' %}📿 Браслет
+                    {% elif order.product_type == 'earrings' %}💎 Серьги
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if order.order_type == 'template' %}📋 Шаблонный
+                    {% elif order.order_type == 'custom' %}✏️ Индивидуальный
+                    {% else %}-{% endif %}
+                </td>
+                <td>{{ order.customer.name }} {{ order.customer.surname }}</td>
+                <td>
+                    <span class="badge 
+                        {% if order.order_status == 'new' %}bg-primary
+                        {% elif order.order_status == 'confirmed' %}bg-info
+                        {% elif order.order_status == 'in_work' %}bg-warning
+                        {% elif order.order_status == 'ready' %}bg-success
+                        {% elif order.order_status == 'delivered' %}bg-secondary
+                        {% endif %}
+                    ">
+                        {{ order.get_status_display_ru }}
+                    </span>
+                </td>
+                <td>{{ order.budget|default:"-" }} ₽</td>
+                <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                <td>
+                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-sm btn-primary">
+                        Открыть
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted mt-3">Всего заказов: {{ orders|length }}</p>
+
+{% else %}
+<div class="alert alert-info text-center">
+    <h4>У вас пока нет заказов</h4>
+    {% if user.role == 'client' %}
+    <p>Создайте свой первый заказ!</p>
+    <a href="{% url 'order_create' %}" class="btn btn-primary">Создать заказ</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

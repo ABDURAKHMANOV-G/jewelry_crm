@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load phone_filters %}
+
+{% block title %}Заказы {{ customer.name }} {{ customer.surname }}{% endblock %}
+
+{% block content %}
+<!-- ИНФОРМАЦИЯ О КЛИЕНТЕ -->
+<div class="card mb-4 shadow">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3 class="mb-2">👤 {{ customer.name }} {{ customer.surname }}</h3>
+                <p class="mb-1">
+                    <i class="bi bi-telephone"></i> {{ customer.phone|format_phone }}
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-envelope"></i> {{ customer.email|default:"—" }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'customer_list' %}" class="btn btn-secondary">
+                    ← Назад к списку клиентов
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ФИЛЬТРЫ -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">🔍 Фильтры</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Статус заказа</label>
+                <select name="status" class="form-control">
+                    <option value="">Все статусы</option>
+                    <option value="new" {% if status_filter == 'new' %}selected{% endif %}>Новый</option>
+                    <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Подтвержден</option>
+                    <option value="in_work" {% if status_filter == 'in_work' %}selected{% endif %}>В работе</option>
+                    <option value="ready" {% if status_filter == 'ready' %}selected{% endif %}>Готов</option>
+                    <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Доставлен</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Тип заказа</label>
+                <select name="order_type" class="form-control">
+                    <option value="">Все типы</option>
+                    <option value="template" {% if order_type_filter == 'template' %}selected{% endif %}>Шаблонный</option>
+                    <option value="custom" {% if order_type_filter == 'custom' %}selected{% endif %}>Индивидуальный</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label class="form-label">Тип изделия</label>
+                <select name="product_type" class="form-control">
+                    <option value="">Все изделия</option>
+                    <option value="ring" {% if product_type_filter == 'ring' %}selected{% endif %}>Кольцо</option>
+                    <option value="brooch" {% if product_type_filter == 'brooch' %}selected{% endif %}>Брошь</option>
+                    <option value="bracelet" {% if product_type_filter == 'bracelet' %}selected{% endif %}>Браслет</option>
+                    <option value="earrings" {% if product_type_filter == 'earrings' %}selected{% endif %}>Серьги</option>
+                </select>
+            </div>
+            
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                <a href="{% url 'customer_orders' customer.customer_id %}" class="btn btn-secondary">Сбросить</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- СПИСОК ЗАКАЗОВ -->
+<h4 class="mb-3">📋 Заказы клиента ({{ orders|length }})</h4>
+
+{% if orders %}
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>№</th>
+                <th>Тип изделия</th>
+                <th>Тип заказа</th>
+                <th>Статус</th>
+                <th>Бюджет</th>
+                <th>Создан</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.order_id }}</strong></td>
+                <td>
+                    {% if order.product_type == 'ring' %}💍 Кольцо
+                    {% elif order.product_type == 'brooch' %}🌸 Брошь
+                    {% elif order.product_type == 'bracelet' %}📿 Браслет
+                    {% elif order.product_type == 'earrings' %}💎 Серьги
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    {% if order.order_type == 'template' %}📋 Шаблонный
+                    {% elif order.order_type == 'custom' %}✏️ Индивидуальный
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if order.order_status == 'new' %}bg-primary
+                        {% elif order.order_status == 'confirmed' %}bg-info
+                        {% elif order.order_status == 'in_work' %}bg-warning
+                        {% elif order.order_status == 'ready' %}bg-success
+                        {% elif order.order_status == 'delivered' %}bg-secondary
+                        {% endif %}
+                    ">
+                        {{ order.get_status_display_ru }}
+                    </span>
+                </td>
+                <td>{{ order.budget|default:"—" }} ₽</td>
+                <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                <td>
+                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-sm btn-primary">
+                        Открыть
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <h4>Заказы не найдены</h4>
+    <p>У этого клиента пока нет заказов с выбранными фильтрами</p>
+</div>
+{% endif %}
+{% endblock %}

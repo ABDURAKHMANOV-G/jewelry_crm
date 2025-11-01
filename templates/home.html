@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Добро пожаловать в CRM-систему ювелирной мастерской!</h1>
+    {% if user.is_authenticated %}
+        <p class="lead">Привет, {{ user.get_full_name|default:user.username }}!</p>
+        <a href="{% url 'order_create' %}" class="btn btn-primary btn-lg">Создать новый заказ</a>
+        <a href="{% url 'order_list' %}" class="btn btn-secondary btn-lg">Мои заказы</a>
+    {% else %}
+        <p class="lead">Создайте свое уникальное ювелирное изделие</p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Регистрация</a>
+        <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Вход</a>
+    {% endif %}
+</div>
+{% endblock %}

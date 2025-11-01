@@ -1,0 +1,65 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+__pycache__/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+
+# Секретные данные
+.env
+*.secret
+secrets.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Виртуальное окружение
+venv/
+env/
+ENV/
+.venv
+
+# База данных (НЕ загружаем БД в Git!)
+*.sqlite3
+*.db
+
+# Миграции (можно оставить в Git)
+# migrations/
+
+# Файлы конфигурации с паролями
+jewelry_crm/settings.py
+
+# Временные файлы
+*.tmp
+*.bak

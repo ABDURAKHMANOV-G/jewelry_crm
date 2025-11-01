@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить заказ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4>Подтверждение удаления</h4>
+            </div>
+            <div class="card-body">
+                <p>Вы действительно хотите удалить заказ <strong>#{{ order.order_id }}</strong>?</p>
+                <p class="text-danger">Это действие нельзя отменить!</p>
+                
+                <form method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Да, удалить</button>
+                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
