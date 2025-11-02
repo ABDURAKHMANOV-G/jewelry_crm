@@ -110,16 +110,52 @@ class Payment(models.Model):
         verbose_name = 'Платеж'
         verbose_name_plural = 'Платежи'
 
-
 class Document(models.Model):
     document_id = models.AutoField(primary_key=True, db_column='document_id')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id')
-    document_type = models.CharField(max_length=50)
-    file_path = models.CharField(max_length=255)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id', related_name='documents')
+    
+    DOCUMENT_TYPE_CHOICES = [
+        ('invoice', 'Счёт на оплату'),
+        ('act', 'Акт оказания услуг'),
+        ('contract', 'Договор на изготовление изделия'),
+    ]
+    document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPE_CHOICES, verbose_name='Тип документа')
+    
+    # Номер документа (автоматически или вручную)
+    document_number = models.CharField(max_length=50, unique=True, verbose_name='Номер документа')
+    
+    # Дата документа
+    document_date = models.DateField(verbose_name='Дата документа')
+    
+    # Сумма
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Сумма')
+    
+    # Описание/Примечание
+    description = models.TextField(null=True, blank=True, verbose_name='Описание')
+    
+    # Файл документа (если загружен)
+    file_path = models.CharField(max_length=255, null=True, blank=True)
+    
+    # Кто создал документ
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, db_column='created_by_id', verbose_name='Создал')
+    
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = False
         db_table = 'documents'
         verbose_name = 'Документ'
         verbose_name_plural = 'Документы'
+        ordering = ['-document_date']
+
+    def __str__(self):
+        return f"{self.get_document_type_display()} №{self.document_number}"
+    
+    def get_document_type_display_icon(self):
+        icons = {
+            'invoice': '📄',
+            'act': '📋',
+            'contract': '📝',
+        }
+        return icons.get(self.document_type, '📄')

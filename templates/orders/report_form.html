@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Формирование отчёта{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📊 Формирование отчёта о работе</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Выберите период и создайте отчёт о деятельности компании ООО «JEWEllUX»</p>
+                
+                <form method="GET" action="{% url 'report_generate' %}">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label"><strong>📅 Начало периода</strong></label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="end_date" class="form-label"><strong>📅 Конец периода</strong></label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-search"></i> Просмотреть отчёт
+                        </button>
+                        <a href="{% url 'order_list' %}" class="btn btn-secondary">
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Быстрые периоды -->
+                <hr>
+                <p class="text-muted small mb-3">Быстрый выбор периода:</p>
+                
+                <div class="btn-group-vertical w-100" role="group">
+                    <form method="GET" action="{% url 'report_generate' %}" style="display: inline;">
+                        <input type="hidden" name="start_date" id="quick_start_today">
+                        <input type="hidden" name="end_date" id="quick_end_today">
+                        <button type="submit" class="btn btn-outline-primary w-100 text-start">Сегодня</button>
+                    </form>
+                    
+                    <form method="GET" action="{% url 'report_generate' %}" style="display: inline;">
+                        <input type="hidden" name="start_date" id="quick_start_week">
+                        <input type="hidden" name="end_date" id="quick_end_week">
+                        <button type="submit" class="btn btn-outline-primary w-100 text-start">На этой неделе</button>
+                    </form>
+                    
+                    <form method="GET" action="{% url 'report_generate' %}" style="display: inline;">
+                        <input type="hidden" name="start_date" id="quick_start_month">
+                        <input type="hidden" name="end_date" id="quick_end_month">
+                        <button type="submit" class="btn btn-outline-primary w-100 text-start">В этом месяце</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Функция для форматирования даты
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+    
+    const today = new Date();
+    
+    // Сегодня
+    document.getElementById('quick_start_today').value = formatDate(today);
+    document.getElementById('quick_end_today').value = formatDate(today);
+    
+    // На этой неделе (понедельник - сегодня)
+    const currentDay = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
+    document.getElementById('quick_start_week').value = formatDate(monday);
+    document.getElementById('quick_end_week').value = formatDate(today);
+    
+    // В этом месяце
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    document.getElementById('quick_start_month').value = formatDate(firstDay);
+    document.getElementById('quick_end_month').value = formatDate(today);
+});
+</script>
+{% endblock %}

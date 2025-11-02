@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать документ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📄 Создать документ для заказа #{{ order.order_id }}</h4>
+            </div>
+            <div class="card-body">
+                <!-- Информация о заказе -->
+                <div class="alert alert-info mb-4">
+                    <strong>Заказ:</strong> #{{ order.order_id }}<br>
+                    <strong>Клиент:</strong> {{ order.customer.name }} {{ order.customer.surname }}<br>
+                    <strong>Бюджет:</strong> {{ order.budget|default:"—" }} ₽
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        {{ form.document_type.label_tag }}
+                        {{ form.document_type }}
+                        <small class="form-text text-muted">Выберите тип создаваемого документа</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.document_number.label_tag }}
+                        {{ form.document_number }}
+                        <small class="form-text text-muted">Оставьте пустым для автоматической генерации</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.document_date.label_tag }}
+                        {{ form.document_date }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.amount.label_tag }}
+                        {{ form.amount }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Создать документ
+                        </button>
+                        <a href="{% url 'document_list' order.order_id %}" class="btn btn-secondary">
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

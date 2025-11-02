@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить документ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Удаление документа</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5>Вы уверены что хотите удалить этот документ?</h5>
+                    <hr>
+                    <p><strong>Тип:</strong> {{ document.get_document_type_display }}</p>
+                    <p><strong>Номер:</strong> {{ document.document_number }}</p>
+                    <p><strong>Дата:</strong> {{ document.document_date|date:"d.m.Y" }}</p>
+                    {% if document.amount %}
+                    <p><strong>Сумма:</strong> {{ document.amount }} ₽</p>
+                    {% endif %}
+                    <hr>
+                    <p class="mb-0 text-danger"><strong>Это действие нельзя отменить!</strong></p>
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Да, удалить
+                        </button>
+                        <a href="{% url 'document_list' document.order.order_id %}" class="btn btn-secondary">
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

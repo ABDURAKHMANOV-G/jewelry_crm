@@ -219,25 +219,29 @@
                     ← Назад к списку
                 </a>
                 
+                <!-- НОВАЯ КНОПКА: Документы -->
+                <a href="{% url 'document_list' order.order_id %}" class="btn btn-info w-100 mb-2">
+                    📄 Документы заказа
+                </a>
+                
                 {% if user.role == 'client' and order.order_status == 'new' %}
                 <a href="{% url 'order_delete' order.order_id %}" 
-                   class="btn btn-danger w-100"
-                   onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
+                class="btn btn-danger w-100"
+                onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
                     🗑️ Удалить заказ
                 </a>
                 {% endif %}
 
                 {% if user.role == 'manager' %}
                 <a href="{% url 'order_delete' order.order_id %}" 
-                   class="btn btn-danger w-100"
-                   onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
+                class="btn btn-danger w-100"
+                onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
                     🗑️ Удалить заказ
                 </a>
                 {% endif %}
             </div>
         </div>
-    </div>
-</div>
+
 
 <!-- ФОРМА РЕДАКТИРОВАНИЯ ДЛЯ МЕНЕДЖЕРА -->
 {% if user.role == 'manager' %}

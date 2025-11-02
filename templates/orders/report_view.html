@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчёт {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }}{% endblock %}
+
+{% block content %}
+<!-- Заголовок -->
+<div class="card mb-4 shadow">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">📊 Отчёт о работе компании</h2>
+                <p class="mb-1">
+                    <strong>Период:</strong> {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }}
+                </p>
+                <p class="mb-0">
+                    <strong>Дата формирования:</strong> {{ now|date:"d.m.Y H:i" }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'report_form' %}" class="btn btn-secondary mb-2">
+                    ← Назад
+                </a>
+                <a href="{% url 'report_export_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-success mb-2">
+                    <i class="bi bi-download"></i> Скачать PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ОБЩАЯ СТАТИСТИКА -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Всего заказов</h5>
+                <h2 class="text-primary">{{ report_data.total_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Общая выручка</h5>
+                <h2 class="text-success">{{ report_data.total_revenue|floatformat:2 }} ₽</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Средний чек</h5>
+                <h2 class="text-info">{{ report_data.avg_order_value|floatformat:2 }} ₽</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Дней в периоде</h5>
+                <h2 class="text-warning">
+                    {% widthratio period_days 1 1 %}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ЗАКАЗЫ ПО СТАТУСАМ -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">📋 Заказы по статусам</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tbody>
+                            {% for item in report_data.status_stats %}
+                            <tr>
+                                <td>
+                                    {% if item.order_status == 'new' %}
+                                        🆕 Новый
+                                    {% elif item.order_status == 'confirmed' %}
+                                        ✅ Подтвержден
+                                    {% elif item.order_status == 'in_work' %}
+                                        ⚙️ В работе
+                                    {% elif item.order_status == 'ready' %}
+                                        ✔️ Готов
+                                    {% elif item.order_status == 'delivered' %}
+                                        📦 Доставлен
+                                    {% endif %}
+                                </td>
+                                <td class="text-end"><strong>{{ item.count }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ТИПЫ ИЗДЕЛИЙ -->
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">💍 Типы изделий</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tbody>
+                            {% for item in report_data.product_stats %}
+                            <tr>
+                                <td>
+                                    {% if item.product_type == 'ring' %}
+                                        💍 Кольца
+                                    {% elif item.product_type == 'brooch' %}
+                                        🌸 Броши
+                                    {% elif item.product_type == 'bracelet' %}
+                                        📿 Браслеты
+                                    {% elif item.product_type == 'earrings' %}
+                                        💎 Серьги
+                                    {% else %}
+                                        ❓ Не указано
+                                    {% endif %}
+                                </td>
+                                <td class="text-end"><strong>{{ item.count }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ТОП КЛИЕНТОВ -->
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">👥 ТОП-5 Клиентов</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Клиент</th>
+                        <th class="text-center">Заказов</th>
+                        <th class="text-end">Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in report_data.top_customers %}
+                    <tr>
+                        <td><strong>{{ customer.customer__name }} {{ customer.customer__surname }}</strong></td>
+                        <td class="text-center">
+                            <span class="badge bg-info">{{ customer.count }}</span>
+                        </td>
+                        <td class="text-end">{{ customer.total_spent|default:0|floatformat:2 }} ₽</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СПИСОК ВСЕХ ЗАКАЗОВ -->
+<div class="card shadow">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">📜 Все заказы за период ({{ orders.count }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>№ Заказа</th>
+                        <th>Клиент</th>
+                        <th>Тип</th>
+                        <th>Статус</th>
+                        <th class="text-end">Сумма</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><strong>#{{ order.order_id }}</strong></td>
+                        <td>{{ order.customer.name }} {{ order.customer.surname }}</td>
+                        <td>
+                            {% if order.product_type == 'ring' %}💍
+                            {% elif order.product_type == 'brooch' %}🌸
+                            {% elif order.product_type == 'bracelet' %}📿
+                            {% elif order.product_type == 'earrings' %}💎
+                            {% endif %}
+                            {{ order.get_product_type_display|default:"—" }}
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if order.order_status == 'new' %}bg-primary
+                                {% elif order.order_status == 'confirmed' %}bg-info
+                                {% elif order.order_status == 'in_work' %}bg-warning
+                                {% elif order.order_status == 'ready' %}bg-success
+                                {% elif order.order_status == 'delivered' %}bg-secondary
+                                {% endif %}
+                            ">
+                                {{ order.get_status_display_ru }}
+                            </span>
+                        </td>
+                        <td class="text-end">{{ order.budget|default:"—" }} ₽</td>
+                        <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Документы заказа #{{ order.order_id }}{% endblock %}
+
+{% block content %}
+<!-- ИНФОРМАЦИЯ О ЗАКАЗЕ -->
+<div class="card mb-4 shadow">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3 class="mb-2">📋 Документы заказа #{{ order.order_id }}</h3>
+                <p class="mb-1">
+                    <strong>Клиент:</strong> {{ order.customer.name }} {{ order.customer.surname }}
+                </p>
+                <p class="mb-0">
+                    <strong>Статус:</strong> 
+                    <span class="badge 
+                        {% if order.order_status == 'new' %}bg-primary
+                        {% elif order.order_status == 'confirmed' %}bg-info
+                        {% elif order.order_status == 'in_work' %}bg-warning
+                        {% elif order.order_status == 'ready' %}bg-success
+                        {% elif order.order_status == 'delivered' %}bg-secondary
+                        {% endif %}
+                    ">
+                        {{ order.get_status_display_ru }}
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary mb-2">
+                    ← Назад к заказу
+                </a>
+                {% if user.role == 'manager' %}
+                <a href="{% url 'document_create' order.order_id %}" class="btn btn-primary mb-2">
+                    <i class="bi bi-plus-circle"></i> Создать документ
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- СПИСОК ДОКУМЕНТОВ -->
+<h4 class="mb-3">📄 Список документов ({{ documents|length }})</h4>
+
+{% if documents %}
+<div class="row">
+    {% for document in documents %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title mb-0">
+                        {{ document.get_document_type_display_icon }} {{ document.get_document_type_display }}
+                    </h5>
+                    <span class="badge bg-secondary">№{{ document.document_number }}</span>
+                </div>
+                
+                <p class="mb-2">
+                    <strong>Дата:</strong> {{ document.document_date|date:"d.m.Y" }}
+                </p>
+                
+                {% if document.amount %}
+                <p class="mb-2">
+                    <strong>Сумма:</strong> <span class="text-success fs-5">{{ document.amount }} ₽</span>
+                </p>
+                {% endif %}
+                
+                {% if document.description %}
+                <p class="mb-2 text-muted">
+                    {{ document.description|truncatewords:20 }}
+                </p>
+                {% endif %}
+                
+                <p class="mb-3 small text-muted">
+                    <strong>Создан:</strong> {{ document.uploaded_at|date:"d.m.Y H:i" }}
+                    {% if document.created_by %}
+                    <br><strong>Автор:</strong> {{ document.created_by.get_full_name|default:document.created_by.username }}
+                    {% endif %}
+                </p>
+                
+                <div class="d-flex gap-2">
+                    <!-- Кнопка PDF для ВСЕХ -->
+                    <a href="{% url 'document_export_pdf' document.document_id %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-download"></i> PDF
+                    </a>
+                    
+                    <!-- Редактирование и удаление только для менеджера -->
+                    {% if user.role == 'manager' %}
+                    <a href="{% url 'document_update' document.document_id %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                    <a href="{% url 'document_delete' document.document_id %}" 
+                    class="btn btn-sm btn-danger"
+                    onclick="return confirm('Вы уверены что хотите удалить этот документ?')">
+                        <i class="bi bi-trash"></i> Удалить
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <h4>Документы не найдены</h4>
+    <p>К этому заказу пока не прикреплено ни одного документа</p>
+    {% if user.role == 'manager' %}
+    <a href="{% url 'document_create' order.order_id %}" class="btn btn-primary">
+        Создать первый документ
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,5 +1,7 @@
 from django import forms
 from .models import Order
+from .models import Document
+from datetime import date
 
 class OrderCreateForm(forms.ModelForm):
     # Выбор типа изделия
@@ -259,3 +261,71 @@ class OrderUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         from accounts.models import User
         self.fields['user'].queryset = User.objects.filter(role__in=['modeler', 'jeweler'])
+
+
+class DocumentCreateForm(forms.ModelForm):
+    document_type = forms.ChoiceField(
+        choices=[
+            ('invoice', 'Счёт на оплату'),
+            ('act', 'Акт оказания услуг'),
+            ('contract', 'Договор на изготовление изделия'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Тип документа'
+    )
+    
+    document_number = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Авто-генерация при пустом поле'}),
+        required=False,
+        label='Номер документа'
+    )
+    
+    document_date = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        initial=date.today,
+        label='Дата документа'
+    )
+    
+    amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Сумма', 'step': '0.01'}),
+        label='Сумма (₽)'
+    )
+    
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Дополнительная информация'}),
+        label='Описание'
+    )
+    
+    class Meta:
+        model = Document
+        fields = ['document_type', 'document_number', 'document_date', 'amount', 'description']
+
+
+class DocumentUpdateForm(forms.ModelForm):
+    document_date = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        label='Дата документа'
+    )
+    
+    amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+        label='Сумма (₽)'
+    )
+    
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        label='Описание'
+    )
+    
+    class Meta:
+        model = Document
+        fields = ['document_date', 'amount', 'description']
