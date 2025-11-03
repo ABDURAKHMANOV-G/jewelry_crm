@@ -1,0 +1,420 @@
+/* ========================================
+   GLOBAL STYLES
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;  /* Скрываем горизонтальный скролл */
+    overflow-y: auto;    /* Вертикальный скролл только при необходимости */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1D262B;
+    color: #ffffff;
+    overflow-x: hidden;  /* Скрываем горизонтальный скролл */
+    min-height: 100vh;   /* Минимальная высота = высота экрана */
+    position: relative;
+}
+
+/* ========================================
+   HEADER STYLES
+   ======================================== */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.container-header {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #d4af37;
+    text-decoration: none;
+}
+
+.logo i {
+    font-size: 32px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+    margin: 0;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.nav-menu a:hover {
+    color: #d4af37;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-outline-gold {
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    background: transparent;
+    padding: 8px 25px;
+    border-radius: 25px;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-outline-gold:hover {
+    background: #d4af37;
+    color: #1a1a1a;
+}
+
+.btn-gold {
+    background: #d4af37;
+    color: #1a1a1a;
+    padding: 15px 25px;
+    border-radius: 5px;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+    border: none;
+    display: inline-block;
+}
+
+.btn-gold:hover {
+    background: #b8941f;
+    color: #1a1a1a;
+}
+
+/* ========================================
+   DROPDOWN MENU
+   ======================================== */
+.dropdown-menu {
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.dropdown-item {
+    color: #cccccc;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.dropdown-item:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: #d4af37;
+}
+
+/* ========================================
+   HERO SECTION - GRID LAYOUT
+   ======================================== */
+.hero-section {
+    min-height: 100vh;
+    max-height: 100vh;           /* Добавлено - ограничиваем высоту */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 100px;
+    position: relative;
+    overflow: hidden;            /* Скрываем всё, что выходит за границы */
+}
+
+/* Фоновое изображение НА ВСЮ СТРАНИЦУ */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 100px;
+    left: 150px;
+    width: 65%;              /* Изменено с 50% на 100% */
+    height: 80%;
+    background-image: url('../images/background_img.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+/* Затемнение поверх фона НА ВСЮ СТРАНИЦУ */
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17, 17, 17, 0.8);
+    z-index: -1;
+}
+
+/* ========================================
+   LEFT SECTION
+   ======================================== */
+.left-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;    /* Изменено с space-between на flex-start */
+    padding: 50px 100px;
+    gap: 60px;                      /* Добавлен отступ между контентом и каруселью */
+    z-index: 1;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #f0f0f0;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+}
+
+/* ========================================
+   PORTFOLIO CAROUSEL
+   ======================================== */
+.portfolio-carousel {
+    margin-top: 0;
+    margin-left: 0;
+}
+
+.portfolio-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 550px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    left: -42px; 
+}
+
+/* Стрелки карусели - УМЕНЬШЕНЫ */
+.carousel-btn {
+    background: rgba(212, 175, 55, 0.2);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    width: 32px;                    /* Уменьшено с 40px до 32px */
+    height: 32px;                   /* Уменьшено с 40px до 32px */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    backdrop-filter: blur(5px);
+    font-size: 14px;                /* Размер иконки */
+}
+
+.carousel-btn:hover {
+    background: #d4af37;
+    color: #1a1a1a;
+}
+
+/* Левая стрелка - ВЫХОДИТ ЗА КРАЙ */
+.carousel-btn.prev {
+    position: relative;
+}
+
+/* Правая стрелка */
+.carousel-btn.next {
+    margin-left: auto;
+}
+
+.carousel-track-container {
+    overflow: hidden;
+    width: 100%;
+    border-radius: 15px;
+    flex: 1;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    gap: 15px;
+}
+
+.carousel-slide {
+    min-width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 175, 55, 0.3);  /* Уменьшена толщина и прозрачность */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.carousel-slide:hover img {
+    transform: scale(1.1);
+}
+
+/* ========================================
+   RIGHT SECTION - DECORATIVE IMAGES
+   ======================================== */
+.right-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    z-index: 1;
+}
+
+.decorative-images {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+}
+
+.deco-image {
+    position: absolute;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    transition: transform 0.3s;
+}
+
+.deco-image:hover {
+    transform: scale(1.05) rotate(0deg) !important;
+}
+
+.deco-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Верхнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.top-image {
+    top: clamp(-5%, 1vh, 10%);              /* Адаптивное вертикальное положение */
+    right: clamp(20%, 35vw, 40%);           /* Адаптивное горизонтальное положение */
+    width: clamp(180px, 13vw, 250px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(-5deg);
+    z-index: 3;
+}
+
+/* Среднее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.middle-image {
+    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
+    left: clamp(5%, 2vw, 15%);             /* Адаптивное горизонтальное положение */
+    width: clamp(200px, 17vw, 280px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(-7deg);
+    z-index: 1;
+}
+
+/* Нижнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.bottom-image {
+    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
+    right: clamp(15%, 9vw, 30%);           /* Адаптивное горизонтальное положение */
+    width: clamp(160px, 15vw, 220px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(9deg);
+    z-index: 2;
+}
+
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1200px) {
+    .hero-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .right-section {
+        display: none;
+    }
+    
+    .left-section {
+        padding: 50px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    
+    .hero-content h1 {
+        font-size: 36px;
+    }
+    
+    .left-section {
+        padding: 30px 20px;
+        gap: 40px;
+    }
+    
+    .carousel-slide {
+        min-width: 120px;
+        height: 120px;
+    }
+}
