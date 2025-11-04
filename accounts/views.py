@@ -81,7 +81,7 @@ def logout_view(request):
     """Выход пользователя"""
     logout(request)
     messages.info(request, 'Вы вышли из системы.')
-    return redirect('home')
+    return redirect('login')
 
 
 @login_required

@@ -50,8 +50,8 @@
                     </ul>
                 </div>
                 <div class="col-md-2">
-                    <div class="auth-buttons justify-content-end">
-                        {% if user.is_authenticated %}
+                    {% if user.is_authenticated %}
+                        <div class="auth-buttons justify-content-end">
                             <div class="dropdown">
                                 <button class="btn-outline-gold dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i>
@@ -75,11 +75,13 @@
                                     </li>
                                 </ul>
                             </div>
-                        {% else %}
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons justify-content-end">
                             <a href="{% url 'login' %}" class="btn-outline-gold">Login</a>
                             <a href="{% url 'register' %}" class="btn-gold">Sign Up</a>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -1,73 +1,132 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Регистрация{% endblock %}
+{% block title %}Регистрация - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Регистрация</h3>
+<section class="auth-section">
+    <div class="auth-container auth-container-wide">
+        
+        <!-- LOGO/TITLE -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="bi bi-gem"></i>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    {% csrf_token %}
-                    
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
+            <h1 class="auth-title">Создать аккаунт</h1>
+            <p class="auth-subtitle">Присоединяйтесь к JEWEllUX</p>
+        </div>
+
+        <!-- CARD -->
+        <div class="auth-card">
+            <form method="POST" class="auth-form" novalidate>
+                {% csrf_token %}
+                
+                <!-- Ошибки формы -->
+                {% if form.errors %}
+                    <div class="auth-alert auth-alert-danger">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <div>
                             {% for field, errors in form.errors.items %}
                                 {% for error in errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             {% endfor %}
                         </div>
-                    {% endif %}
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">Имя пользователя</label>
-                        {{ form.username }}
+                    </div>
+                {% endif %}
+                
+                <!-- Имя пользователя -->
+                <div class="auth-field">
+                    <label for="{{ form.username.id_for_label }}" class="auth-label">
+                        <i class="bi bi-person"></i>
+                        Имя пользователя *
+                    </label>
+                    {{ form.username }}
+                </div>
+                
+                <!-- Имя и Фамилия -->
+                <div class="auth-row">
+                    <div class="auth-field">
+                        <label for="{{ form.first_name.id_for_label }}" class="auth-label">
+                            <i class="bi bi-person-badge"></i>
+                            Имя *
+                        </label>
+                        {{ form.first_name }}
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">Имя</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Фамилия</label>
-                            {{ form.last_name }}
-                        </div>
+                    <div class="auth-field">
+                        <label for="{{ form.last_name.id_for_label }}" class="auth-label">
+                            <i class="bi bi-person-badge"></i>
+                            Фамилия *
+                        </label>
+                        {{ form.last_name }}
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                        {{ form.email }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.phone.id_for_label }}" class="form-label">Телефон</label>
-                        {{ form.phone }}
-                        <small class="form-text text-muted">Необязательно</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="{{ form.password1.id_for_label }}" class="form-label">Пароль</label>
+                </div>
+                
+                <!-- Email -->
+                <div class="auth-field">
+                    <label for="{{ form.email.id_for_label }}" class="auth-label">
+                        <i class="bi bi-envelope"></i>
+                        Email *
+                    </label>
+                    {{ form.email }}
+                </div>
+                
+                <!-- Телефон -->
+                <div class="auth-field">
+                    <label for="{{ form.phone.id_for_label }}" class="auth-label">
+                        <i class="bi bi-telephone"></i>
+                        Телефон
+                    </label>
+                    {{ form.phone }}
+                    <small class="auth-hint">Необязательно</small>
+                </div>
+                
+                <!-- Пароли -->
+                <div class="auth-row">
+                    <div class="auth-field">
+                        <label for="{{ form.password1.id_for_label }}" class="auth-label">
+                            <i class="bi bi-lock"></i>
+                            Пароль *
+                        </label>
                         {{ form.password1 }}
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.password2.id_for_label }}" class="form-label">Подтвердите пароль</label>
+                    <div class="auth-field">
+                        <label for="{{ form.password2.id_for_label }}" class="auth-label">
+                            <i class="bi bi-lock-fill"></i>
+                            Подтвердите пароль *
+                        </label>
                         {{ form.password2 }}
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
-                </form>
-                <hr>
-                <p class="text-center mb-0">
-                    Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
-                </p>
+                </div>
+                
+                <!-- Кнопка регистрации -->
+                <button type="submit" class="auth-btn-primary">
+                    <i class="bi bi-person-plus"></i>
+                    Зарегистрироваться
+                </button>
+            </form>
+            
+            <!-- Разделитель -->
+            <div class="auth-divider">
+                <span>или</span>
+            </div>
+            
+            <!-- Ссылка на вход -->
+            <div class="auth-footer">
+                <p class="auth-footer-text">Уже есть аккаунт?</p>
+                <a href="{% url 'login' %}" class="auth-link">
+                    Войти
+                    <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
         </div>
+        
     </div>
-</div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}
