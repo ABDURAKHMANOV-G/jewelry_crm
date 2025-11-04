@@ -1,157 +1,76 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEWEllUX - Эксклюзивные ювелирные изделия</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <!-- HEADER -->
-    <header class="main-header">
-        <div class="container-header">
-            <div class="row align-items-center">
-                <div class="col-md-2">
-                    <a href="{% url 'home' %}" class="logo">
-                        <i class="bi bi-gem"></i>
-                        JEWEllUX
-                    </a>
-                </div>
-                <div class="col-md-8">
-                    <ul class="nav-menu justify-content-center">
-                        <li><a href="{% url 'home' %}">ГЛАВНАЯ</a></li>
-                        <li><a href="#portfolio">НОВАЯ КОЛЛЕКЦИЯ</a></li>
-                        <li><a href="#about">О НАС</a></li>
-                        <li><a href="#contact">СВЯЗАТЬСЯ</a></li>
-                        
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'order_list' %}">МОИ ЗАКАЗЫ</a></li>
-                            {% if user.role == 'manager' %}
-                            <li><a href="{% url 'customer_list' %}">КЛИЕНТЫ</a></li>
-                            <li><a href="{% url 'report_form' %}">ОТЧЁТЫ</a></li>
-                            {% endif %}
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="col-md-2">
-                    <div class="auth-buttons justify-content-end">
-                        {% if user.is_authenticated %}
-                            <div class="dropdown">
-                                <button class="btn-outline-gold dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i>
-                                    {{ user.get_full_name|default:user.username|truncatewords:2 }}
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li style="padding: 10px 20px; border-bottom: 1px solid #3d3d3d;">
-                                        <div style="color: #cccccc; font-size: 12px;">Роль:</div>
-                                        <div style="color: #d4af37; font-weight: 600;">
-                                            {% if user.role == 'manager' %}Менеджер
-                                            {% elif user.role == 'client' %}Клиент
-                                            {% elif user.role == 'modeler' %}Модельер
-                                            {% elif user.role == 'jeweler' %}Ювелир
-                                            {% endif %}
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{% url 'logout' %}">
-                                            <i class="bi bi-box-arrow-right"></i> Выход
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn-outline-gold">Login</a>
-                            <a href="{% url 'register' %}" class="btn-gold">Sign Up</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- HERO SECTION -->
-    <section class="hero-section" id="home">
-        <!-- Левая часть: Текст и карусель -->
-        <div class="left-section">
-            <div class="hero-content">
-                <h1>Создай свое уникальное изделие в один клик</h1>
-                <p>Наша система позволяет с легкостью сформулировать задание для ювелира и превратить ваши самые смелые идеи в реальность</p>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'order_create' %}" class="btn-gold btn-lg">Сделать заказ</a>
-                {% else %}
-                    <a href="{% url 'register' %}" class="btn-gold btn-lg">Начать создание</a>
-                {% endif %}
-            </div>
+{% block title %}JEWEllUX - Главная{% endblock %}
 
-            <!-- Карусель примеров работ -->
-            <div class="portfolio-carousel">
-                <h2 class="portfolio-title">Примеры наших работ</h2>
-                <div class="carousel-container">
-                    <button class="carousel-btn prev" id="prevBtn">
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
-                    
-            <div class="carousel-track-container">
-                <div class="carousel-track" id="carouselTrack">
-                    <div class="carousel-slide">
-                        <img src="{% static 'images/example1.png' %}" alt="Кольцо 1">
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="{% static 'images/example2.png' %}" alt="Браслет">
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="{% static 'images/example3.png' %}" alt="Кольцо 2">
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="{% static 'images/example4.png' %}" alt="Обручальные кольца">
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="{% static 'images/example5.png' %}" alt="Серьги">
-                    </div>
-                </div>
-            </div>
-                    
-                    <button class="carousel-btn next" id="nextBtn">
-                        <i class="bi bi-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero-section" id="home">
+    <!-- Левая часть: Текст и карусель -->
+    <div class="left-section">
+        <div class="hero-content">
+            <h1>Создай свое уникальное изделие в один клик</h1>
+            <p>Наша система позволяет с легкостью сформулировать задание для ювелира и превратить ваши самые смелые идеи в реальность</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'order_create' %}" class="btn-gold btn-lg">Сделать заказ</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn-gold btn-lg">Начать создание</a>
+            {% endif %}
         </div>
 
-        <!-- Правая часть: Декоративные изображения -->
-        <div class="right-section">
-            <div class="decorative-images">
-                <!-- Верхнее изображение (чайник с чашками) -->
-                <div class="deco-image top-image">
-                    <img src="{% static 'images/right-1.png' %}" alt="Серебряный сервиз">
+        <!-- Карусель примеров работ -->
+        <div class="portfolio-carousel">
+            <h2 class="portfolio-title">Примеры наших работ</h2>
+            <div class="carousel-container">
+                <button class="carousel-btn prev" id="prevBtn">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                
+                <div class="carousel-track-container">
+                    <div class="carousel-track" id="carouselTrack">
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example1.png' %}" alt="Кольцо 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example2.png' %}" alt="Браслет">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example3.png' %}" alt="Кольцо 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example4.png' %}" alt="Обручальные кольца">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example5.png' %}" alt="Серьги">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{% static 'images/example_trans1.png' %}" alt="Колье">
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Среднее изображение (бокалы с узорами) -->
-                <div class="deco-image middle-image">
-                    <img src="{% static 'images/right-2.png' %}" alt="Декоративные бокалы">
-                </div>
-                
-                <!-- Нижнее изображение (золотые бокалы) -->
-                <div class="deco-image bottom-image">
-                    <img src="{% static 'images/right-3.png' %}" alt="Золотые бокалы">
-                </div>
+                <button class="carousel-btn next" id="nextBtn">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
-    <script src="{% static 'js/main.js' %}"></script>
-</body>
-</html>
+    <!-- Правая часть: Декоративные изображения -->
+    <div class="right-section">
+        <div class="decorative-images">
+            <div class="deco-image top-image">
+                <img src="{% static 'images/right-1.png' %}" alt="Серебряный сервиз">
+            </div>
+            
+            <div class="deco-image middle-image">
+                <img src="{% static 'images/right-2.png' %}" alt="Декоративные бокалы">
+            </div>
+            
+            <div class="deco-image bottom-image">
+                <img src="{% static 'images/right-3.png' %}" alt="Золотые бокалы">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,3 +1,7 @@
+/* ==========================================
+   STYLE.CSS - ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ СТРАНИЦ
+   ========================================== */
+
 /* ========================================
    GLOBAL STYLES
    ======================================== */
@@ -8,17 +12,39 @@
 }
 
 html {
-    overflow-x: hidden;  /* Скрываем горизонтальный скролл */
-    overflow-y: auto;    /* Вертикальный скролл только при необходимости */
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    height: 100%;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1D262B;
+    background: #1D262B;        /* Тот же цвет что у orders-section */
     color: #ffffff;
-    overflow-x: hidden;  /* Скрываем горизонтальный скролл */
-    min-height: 100vh;   /* Минимальная высота = высота экрана */
+    overflow-x: hidden;
+    min-height: 100vh;
+    height: 100%;               /* Добавлено */
     position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main content area */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-section,
+.left-section,
+.right-section {
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 /* ========================================
@@ -34,12 +60,17 @@ body {
     backdrop-filter: blur(10px);
     padding: 20px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: visible;          /* Изменено с hidden на visible */
 }
 
 .container-header {
     margin-left: 50px;
     margin-right: 50px;
+    max-width: 100%;
+    overflow: visible;          /* Изменено - чтобы dropdown был виден */
+    position: relative;         /* Добавлено */
 }
+
 
 .logo {
     display: flex;
@@ -133,6 +164,8 @@ body {
     border-radius: 12px;
     padding: 10px;
     margin-top: 10px;
+    z-index: 10000;             /* Добавлено - очень высокий z-index */
+    position: absolute;         /* Убедись что это есть */
 }
 
 .dropdown-item {
@@ -148,254 +181,139 @@ body {
 }
 
 /* ========================================
-   HERO SECTION - GRID LAYOUT
+   FOOTER STYLES
    ======================================== */
-.hero-section {
-    min-height: 100vh;
-    max-height: 100vh;           /* Добавлено - ограничиваем высоту */
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding-top: 100px;
-    position: relative;
-    overflow: hidden;            /* Скрываем всё, что выходит за границы */
-}
-
-/* Фоновое изображение НА ВСЮ СТРАНИЦУ */
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 100px;
-    left: 150px;
-    width: 65%;              /* Изменено с 50% на 100% */
-    height: 80%;
-    background-image: url('../images/background_img.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: -2;
-}
-
-/* Затемнение поверх фона НА ВСЮ СТРАНИЦУ */
-.hero-section::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(17, 17, 17, 0.8);
-    z-index: -1;
-}
-
-/* ========================================
-   LEFT SECTION
-   ======================================== */
-.left-section {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;    /* Изменено с space-between на flex-start */
-    padding: 50px 100px;
-    gap: 60px;                      /* Добавлен отступ между контентом и каруселью */
-    z-index: 1;
-}
-
-.hero-content {
-    max-width: 700px;
-}
-
-.hero-content h1 {
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 20px;
+.main-footer {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
     color: #ffffff;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.hero-content p {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #f0f0f0;
-    margin-bottom: 30px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-    max-width: 400px;
-}
-
-/* ========================================
-   PORTFOLIO CAROUSEL
-   ======================================== */
-.portfolio-carousel {
+    padding: 25px 0;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
     margin-top: 0;
-    margin-left: 0;
-}
-
-.portfolio-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.carousel-container {
-    position: relative;
+    margin-bottom: 0;
     width: 100%;
-    max-width: 550px;
+}
+
+
+.footer-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 50px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.footer-logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    left: -42px; 
+    font-size: 20px;
+    font-weight: bold;
+    color: #d4af37;
+    flex-shrink: 0;
 }
 
-/* Стрелки карусели - УМЕНЬШЕНЫ */
-.carousel-btn {
-    background: rgba(212, 175, 55, 0.2);
-    border: 2px solid #d4af37;
+.footer-logo i {
+    font-size: 28px;
+}
+
+.footer-contacts {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #cccccc;
+    white-space: nowrap;
+}
+
+.footer-contact-item i {
     color: #d4af37;
-    width: 32px;                    /* Уменьшено с 40px до 32px */
-    height: 32px;                   /* Уменьшено с 40px до 32px */
-    border-radius: 50%;
+    font-size: 14px;
+}
+
+.footer-contact-item a {
+    color: #cccccc;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-contact-item a:hover {
+    color: #d4af37;
+}
+
+.footer-legal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #999999;
+    white-space: nowrap;
+}
+
+.footer-legal .separator {
+    color: #666666;
+}
+
+.footer-legal a {
+    color: #999999;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-legal a:hover {
+    color: #d4af37;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.social-link {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 50%;
+    color: #d4af37;
+    font-size: 16px;
     transition: all 0.3s;
-    flex-shrink: 0;
-    backdrop-filter: blur(5px);
-    font-size: 14px;                /* Размер иконки */
+    text-decoration: none;
 }
 
-.carousel-btn:hover {
+.social-link:hover {
     background: #d4af37;
     color: #1a1a1a;
-}
-
-/* Левая стрелка - ВЫХОДИТ ЗА КРАЙ */
-.carousel-btn.prev {
-    position: relative;
-}
-
-/* Правая стрелка */
-.carousel-btn.next {
-    margin-left: auto;
-}
-
-.carousel-track-container {
-    overflow: hidden;
-    width: 100%;
-    border-radius: 15px;
-    flex: 1;
-}
-
-.carousel-track {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    gap: 15px;
-}
-
-.carousel-slide {
-    min-width: 150px;
-    height: 150px;
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid rgba(212, 175, 55, 0.3);  /* Уменьшена толщина и прозрачность */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-    flex-shrink: 0;
-}
-
-.carousel-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.carousel-slide:hover img {
-    transform: scale(1.1);
+    transform: translateY(-3px);
 }
 
 /* ========================================
-   RIGHT SECTION - DECORATIVE IMAGES
-   ======================================== */
-.right-section {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 50px;
-    z-index: 1;
-}
-
-.decorative-images {
-    position: relative;
-    width: 100%;
-    height: 80vh;
-}
-
-.deco-image {
-    position: absolute;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    transition: transform 0.3s;
-}
-
-.deco-image:hover {
-    transform: scale(1.05) rotate(0deg) !important;
-}
-
-.deco-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Верхнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
-.top-image {
-    top: clamp(-5%, 1vh, 10%);              /* Адаптивное вертикальное положение */
-    right: clamp(20%, 35vw, 40%);           /* Адаптивное горизонтальное положение */
-    width: clamp(180px, 13vw, 250px);       /* Адаптивная ширина */
-    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
-    transform: rotate(-5deg);
-    z-index: 3;
-}
-
-/* Среднее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
-.middle-image {
-    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
-    left: clamp(5%, 2vw, 15%);             /* Адаптивное горизонтальное положение */
-    width: clamp(200px, 17vw, 280px);       /* Адаптивная ширина */
-    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
-    transform: rotate(-7deg);
-    z-index: 1;
-}
-
-/* Нижнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
-.bottom-image {
-    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
-    right: clamp(15%, 9vw, 30%);           /* Адаптивное горизонтальное положение */
-    width: clamp(160px, 15vw, 220px);       /* Адаптивная ширина */
-    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
-    transform: rotate(9deg);
-    z-index: 2;
-}
-
-
-/* ========================================
-   RESPONSIVE DESIGN
+   RESPONSIVE - GLOBAL
    ======================================== */
 @media (max-width: 1200px) {
-    .hero-section {
-        grid-template-columns: 1fr;
+    .footer-content {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
     }
     
-    .right-section {
-        display: none;
-    }
-    
-    .left-section {
-        padding: 50px;
+    .footer-contacts {
+        gap: 15px;
     }
 }
 
@@ -404,17 +322,101 @@ body {
         display: none;
     }
     
-    .hero-content h1 {
-        font-size: 36px;
+    .footer-container {
+        padding: 0 20px;
     }
     
-    .left-section {
-        padding: 30px 20px;
-        gap: 40px;
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .footer-contacts {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .footer-legal {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .footer-legal .separator {
+        display: none;
+    }
+    
+    .social-link {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   LARGE SCREENS (24" и больше)
+   ======================================== */
+@media (min-width: 1920px) {
+    .hero-content h1 {
+        font-size: 64px;
+    }
+    
+    .hero-content p {
+        font-size: 20px;
+        max-width: 550px;
+    }
+    
+    .top-image {
+        width: clamp(220px, 15vw, 300px);
+        height: clamp(280px, 20vw, 400px);
+    }
+    
+    .middle-image {
+        width: clamp(250px, 17vw, 340px);
+        height: clamp(280px, 20vw, 400px);
+    }
+    
+    .bottom-image {
+        width: clamp(200px, 13vw, 270px);
+        height: clamp(280px, 20vw, 400px);
     }
     
     .carousel-slide {
-        min-width: 120px;
-        height: 120px;
+        min-width: 180px;
+        height: 180px;
     }
+}
+
+@media (min-width: 2560px) {
+    .container-header {
+        margin-left: 100px;
+        margin-right: 100px;
+    }
+    
+    .left-section {
+        padding: 50px 150px;
+    }
+}
+
+/* ========================================
+   STICKY FOOTER FIX
+   ======================================== */
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.main-content {
+    flex: 1 0 auto;              /* Занимает всё доступное место */
+}
+
+.main-footer {
+    flex-shrink: 0;              /* Футер не сжимается */
 }

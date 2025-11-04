@@ -1,379 +1,149 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}JEWEllUX CRM{% endblock %}</title>
+    <title>{% block title %}JEWEllUX - Эксклюзивные ювелирные изделия{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --gold: #d4af37;
-            --gold-hover: #b8941f;
-            --dark-bg: #1a1a1a;
-            --dark-card: #2d2d2d;
-            --dark-border: #3d3d3d;
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: var(--text-primary);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-        }
-
-        /* NAVBAR */
-        .navbar {
-            background: rgba(26, 26, 26, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .navbar-brand {
-            color: var(--gold) !important;
-            font-weight: 700;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .navbar-brand:hover {
-            color: var(--gold-hover) !important;
-            transform: scale(1.05);
-        }
-
-        .nav-link {
-            color: var(--text-secondary) !important;
-            font-weight: 500;
-            transition: all 0.3s;
-            position: relative;
-            padding: 8px 15px !important;
-            border-radius: 8px;
-        }
-
-        .nav-link:hover {
-            color: var(--gold) !important;
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .nav-link.active {
-            color: var(--gold) !important;
-            background: rgba(212, 175, 55, 0.15);
-        }
-
-        /* DROPDOWN */
-        .dropdown-menu {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            padding: 10px;
-        }
-
-        .dropdown-item {
-            color: var(--text-secondary);
-            border-radius: 8px;
-            padding: 10px 15px;
-            transition: all 0.3s;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--gold);
-        }
-
-        .dropdown-toggle {
-            background: rgba(212, 175, 55, 0.1);
-            border-radius: 25px;
-            padding: 8px 20px !important;
-        }
-
-        .dropdown-toggle:hover {
-            background: rgba(212, 175, 55, 0.2);
-        }
-
-        /* MAIN CONTENT */
-        .main-content {
-            padding: 30px 0 60px 0;
-            min-height: calc(100vh - 70px);
-        }
-
-        /* ALERTS */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.15);
-            color: #5cb85c;
-            border-left: 4px solid #5cb85c;
-        }
-
-        .alert-danger {
-            background: rgba(220, 53, 69, 0.15);
-            color: #dc3545;
-            border-left: 4px solid #dc3545;
-        }
-
-        .alert-warning {
-            background: rgba(255, 193, 7, 0.15);
-            color: #ffc107;
-            border-left: 4px solid #ffc107;
-        }
-
-        .alert-info {
-            background: rgba(13, 202, 240, 0.15);
-            color: #0dcaf0;
-            border-left: 4px solid #0dcaf0;
-        }
-
-        /* BUTTONS */
-        .btn-primary {
-            background: var(--gold);
-            border: none;
-            color: #1a1a1a;
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 10px 25px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover {
-            background: var(--gold-hover);
-            color: #1a1a1a;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            color: var(--text-secondary);
-            border-radius: 8px;
-            padding: 10px 25px;
-            transition: all 0.3s;
-        }
-
-        .btn-secondary:hover {
-            background: var(--dark-border);
-            color: var(--text-primary);
-            border-color: var(--gold);
-        }
-
-        /* CARDS */
-        .card {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-        }
-
-        .card-header {
-            background: rgba(212, 175, 55, 0.1);
-            border-bottom: 1px solid var(--dark-border);
-            border-radius: 15px 15px 0 0 !important;
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .card-body {
-            color: var(--text-secondary);
-        }
-
-        /* TABLES */
-        .table {
-            color: var(--text-secondary);
-        }
-
-        .table thead {
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--gold);
-        }
-
-        .table-hover tbody tr:hover {
-            background: rgba(212, 175, 55, 0.05);
-            color: var(--text-primary);
-        }
-
-        /* FORMS */
-        .form-control,
-        .form-select {
-            background: var(--dark-card);
-            border: 1px solid var(--dark-border);
-            color: var(--text-primary);
-            border-radius: 8px;
-            padding: 10px 15px;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background: var(--dark-card);
-            border-color: var(--gold);
-            color: var(--text-primary);
-            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
-        }
-
-        .form-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* BADGE */
-        .badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gold-hover);
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 18px;
-            }
-
-            .main-content {
-                padding: 20px 0 40px 0;
-            }
-        }
-    </style>
+    
+    <!-- Custom CSS - Общие стили -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Custom CSS - Стили страниц -->
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+    
+    <!-- Дополнительные стили для конкретных страниц -->
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-gem"></i>
-                JEWEllUX CRM
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/orders/' %}active{% endif %}" 
-                               href="{% url 'order_list' %}">
-                                <i class="bi bi-clipboard-check"></i> Заказы
-                            </a>
-                        </li>
+    <!-- HEADER -->
+    <header class="main-header">
+        <div class="container-header">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <a href="{% url 'home' %}" class="logo">
+                        <i class="bi bi-gem"></i>
+                        JEWEllUX
+                    </a>
+                </div>
+                <div class="col-md-8">
+                    <ul class="nav-menu justify-content-center">
+                        <li><a href="{% url 'home' %}">ГЛАВНАЯ</a></li>
+                        <li><a href="#portfolio">НОВАЯ КОЛЛЕКЦИЯ</a></li>
+                        <li><a href="#about">О НАС</a></li>
+                        <li><a href="#contact">СВЯЗАТЬСЯ</a></li>
                         
-                        {% if user.role == 'manager' %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if 'customers' in request.path %}active{% endif %}" 
-                               href="{% url 'customer_list' %}">
-                                <i class="bi bi-people"></i> Клиенты
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if 'reports' in request.path %}active{% endif %}" 
-                               href="{% url 'report_form' %}">
-                                <i class="bi bi-bar-chart"></i> Отчёты
-                            </a>
-                        </li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'order_list' %}">МОИ ЗАКАЗЫ</a></li>
+                            
+                            {% if user.role == 'manager' %}
+                            <li><a href="{% url 'customer_list' %}">КЛИЕНТЫ</a></li>
+                            <li><a href="{% url 'report_form' %}">ОТЧЁТЫ</a></li>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                </ul>
-                
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i>
-                                {{ user.get_full_name|default:user.username }}
-                                {% if user.role == 'manager' %}
-                                    <span class="badge bg-warning text-dark">Менеджер</span>
-                                {% elif user.role == 'client' %}
-                                    <span class="badge bg-info">Клиент</span>
-                                {% elif user.role == 'modeler' %}
-                                    <span class="badge bg-primary">Модельер</span>
-                                {% elif user.role == 'jeweler' %}
-                                    <span class="badge bg-success">Ювелир</span>
-                                {% endif %}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'logout' %}">
-                                        <i class="bi bi-box-arrow-right"></i> Выход
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">
-                                <i class="bi bi-box-arrow-in-right"></i> Вход
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">
-                                <i class="bi bi-person-plus"></i> Регистрация
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <div class="auth-buttons justify-content-end">
+                        {% if user.is_authenticated %}
+                            <div class="dropdown">
+                                <button class="btn-outline-gold dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i>
+                                    {{ user.get_full_name|default:user.username|truncatewords:2 }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li style="padding: 10px 20px; border-bottom: 1px solid #3d3d3d;">
+                                        <div style="color: #cccccc; font-size: 12px;">Роль:</div>
+                                        <div style="color: #d4af37; font-weight: 600;">
+                                            {% if user.role == 'manager' %}Менеджер
+                                            {% elif user.role == 'client' %}Клиент
+                                            {% elif user.role == 'modeler' %}Модельер
+                                            {% elif user.role == 'jeweler' %}Ювелир
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'logout' %}">
+                                            <i class="bi bi-box-arrow-right"></i> Выход
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn-outline-gold">Login</a>
+                            <a href="{% url 'register' %}" class="btn-gold">Sign Up</a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Контент -->
-    <div class="container main-content">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
+    <!-- MAIN CONTENT -->
+    <main>
         {% block content %}
+        <!-- Контент каждой страницы будет здесь -->
         {% endblock %}
-    </div>
+    </main>
 
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <!-- Логотип -->
+                <div class="footer-logo">
+                    <i class="bi bi-gem"></i>
+                    <span>JEWEllUX</span>
+                </div>
+
+                <!-- Контакты -->
+                <div class="footer-contacts">
+                    <div class="footer-contact-item">
+                        <i class="bi bi-telephone"></i>
+                        <a href="tel:+79999999999">+7 (999) 999-99-99</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <a href="mailto:info@jewellux.ru">info@jewellux.ru</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>г. Махачкала, ул. Примерная, д. 123</span>
+                    </div>
+                </div>
+
+                <!-- Copyright + Политика -->
+                <div class="footer-legal">
+                    <span>&copy; 2025 JEWEllUX</span>
+                    <span class="separator">|</span>
+                    <a href="#">Политика конфиденциальности</a>
+                </div>
+
+                <!-- Соцсети -->
+                <div class="footer-socials">
+                    <a href="#" class="social-link" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Telegram">
+                        <i class="bi bi-telegram"></i>
+                    </a>
+                    <a href="#" class="social-link" aria-label="WhatsApp">
+                        <i class="bi bi-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

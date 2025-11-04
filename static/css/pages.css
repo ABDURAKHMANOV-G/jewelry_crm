@@ -1,0 +1,529 @@
+
+/* ========================================
+   HERO SECTION - GRID LAYOUT
+   ======================================== */
+.hero-section {
+    min-height: 100vh;
+    max-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 100px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;  /* Добавлено */
+}
+
+/* Фоновое изображение НА ВСЮ СТРАНИЦУ */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 100px;
+    left: 150px;
+    width: 65%;              /* Изменено с 50% на 100% */
+    height: 80%;
+    background-image: url('../images/background_img.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+/* Затемнение поверх фона НА ВСЮ СТРАНИЦУ */
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17, 17, 17, 0.8);
+    z-index: -1;
+}
+
+/* ========================================
+   LEFT SECTION
+   ======================================== */
+.left-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;    /* Изменено с space-between на flex-start */
+    padding: 50px 100px;
+    gap: 60px;                      /* Добавлен отступ между контентом и каруселью */
+    z-index: 1;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #f0f0f0;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+}
+
+/* ========================================
+   PORTFOLIO CAROUSEL
+   ======================================== */
+.portfolio-carousel {
+    margin-top: 0;
+    margin-left: 0;
+}
+
+.portfolio-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 550px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    left: -42px; 
+}
+
+/* Стрелки карусели - УМЕНЬШЕНЫ */
+.carousel-btn {
+    background: rgba(212, 175, 55, 0.2);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    width: 32px;                    /* Уменьшено с 40px до 32px */
+    height: 32px;                   /* Уменьшено с 40px до 32px */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    backdrop-filter: blur(5px);
+    font-size: 14px;                /* Размер иконки */
+}
+
+.carousel-btn:hover {
+    background: #d4af37;
+    color: #1a1a1a;
+}
+
+/* Левая стрелка - ВЫХОДИТ ЗА КРАЙ */
+.carousel-btn.prev {
+    position: relative;
+}
+
+/* Правая стрелка */
+.carousel-btn.next {
+    margin-left: auto;
+}
+
+.carousel-track-container {
+    overflow: hidden;
+    width: 100%;
+    border-radius: 15px;
+    flex: 1;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    gap: 15px;
+}
+
+.carousel-slide {
+    min-width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 175, 55, 0.3);  /* Уменьшена толщина и прозрачность */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.carousel-slide:hover img {
+    transform: scale(1.1);
+}
+
+/* ========================================
+   RIGHT SECTION - DECORATIVE IMAGES
+   ======================================== */
+.right-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    z-index: 1;
+}
+
+.decorative-images {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+}
+
+.deco-image {
+    position: absolute;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    transition: transform 0.3s;
+}
+
+.deco-image:hover {
+    transform: scale(1.05) rotate(0deg) !important;
+}
+
+.deco-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Верхнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.top-image {
+    top: clamp(-5%, 1vh, 10%);              /* Адаптивное вертикальное положение */
+    right: clamp(20%, 35vw, 40%);           /* Адаптивное горизонтальное положение */
+    width: clamp(180px, 13vw, 250px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(-5deg);
+    z-index: 3;
+}
+
+/* Среднее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.middle-image {
+    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
+    left: clamp(5%, 2vw, 15%);             /* Адаптивное горизонтальное положение */
+    width: clamp(200px, 17vw, 280px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(-7deg);
+    z-index: 1;
+}
+
+/* Нижнее изображение - ПОЛНОСТЬЮ АДАПТИВНОЕ */
+.bottom-image {
+    top: clamp(35%, 35vh, 45%);             /* Адаптивное вертикальное положение */
+    right: clamp(15%, 9vw, 30%);           /* Адаптивное горизонтальное положение */
+    width: clamp(160px, 15vw, 220px);       /* Адаптивная ширина */
+    height: clamp(240px, 18vw, 340px);      /* Адаптивная высота */
+    transform: rotate(9deg);
+    z-index: 2;
+}
+
+/* ========================================
+   ORDERS PAGE STYLES
+   ======================================== */
+.orders-section {
+    background: #1D262B;
+    min-height: calc(100vh - 55px - 40px);  /* 100vh - высота header - высота footer */
+    padding-top: 120px;
+    padding-bottom: 30px;
+}
+
+.container-orders {
+    max-width: 1400px;
+    margin: 0 auto 0 auto;      /* Убираем margin-bottom */
+    padding: 0 50px;
+}
+
+.orders-count {
+    margin-top: 20px;
+    margin-bottom: 0;           /* Убираем margin-bottom */
+    color: #999999;
+    font-size: 14px;
+    text-align: right;
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.orders-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.orders-title i {
+    color: #d4af37;
+    font-size: 36px;
+}
+
+.orders-table-wrapper {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table thead {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+.orders-table thead tr {
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.orders-table th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.orders-table tbody tr {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s;
+}
+
+.orders-table tbody tr:hover {
+    background: rgba(212, 175, 55, 0.08);
+    transform: translateX(5px);
+}
+
+.orders-table td {
+    padding: 16px 12px;
+    color: #cccccc;
+    font-size: 14px;
+}
+
+.orders-table td strong {
+    color: #d4af37;
+    font-weight: 600;
+}
+
+.product-type,
+.order-type {
+    display: inline-block;
+    font-size: 14px;
+}
+
+.order-type.template {
+    color: #8ab4f8;
+}
+
+.order-type.custom {
+    color: #f8b88a;
+}
+
+.budget {
+    font-weight: 600;
+    color: #d4af37;
+}
+
+.date {
+    color: #999999;
+    font-size: 13px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-new {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.status-confirmed {
+    background: rgba(14, 165, 233, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(14, 165, 233, 0.4);
+}
+
+.status-in_work {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.status-ready {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.status-delivered {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a78bfa;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.btn-view {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 6px;
+    color: #d4af37;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-view:hover {
+    background: #d4af37;
+    color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+.no-orders {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+}
+
+.no-orders i {
+    font-size: 80px;
+    color: rgba(212, 175, 55, 0.3);
+    margin-bottom: 20px;
+}
+
+.no-orders h4 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.no-orders p {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 30px;
+}
+
+.orders-count {
+    margin-top: 20px;
+    color: #999999;
+    font-size: 14px;
+    text-align: right;
+}
+
+/* ========================================
+   RESPONSIVE - PAGES
+   ======================================== */
+@media (max-width: 1200px) {
+    .hero-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .right-section {
+        display: none;
+    }
+    
+    .left-section {
+        padding: 50px;
+    }
+    
+    .orders-table {
+        font-size: 13px;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 12px 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 36px;
+    }
+    
+    .left-section {
+        padding: 30px 20px;
+        gap: 40px;
+    }
+    
+    .carousel-slide {
+        min-width: 120px;
+        height: 120px;
+    }
+    
+    .container-orders {
+        padding: 0 20px;
+    }
+    
+    .orders-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .orders-title {
+        font-size: 24px;
+    }
+    
+    .orders-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .orders-table {
+        min-width: 800px;
+    }
+}
+
+/* Убираем лишние отступы для страницы заказов */
+.orders-section ~ .main-footer {
+    margin-top: 0;
+}
+
+/* Или убираем padding у контейнера */
+.container-orders {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 50px 0 50px;     /* Убираем нижний padding */
+}
+
