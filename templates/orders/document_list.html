@@ -1,116 +1,158 @@
 {% extends 'base.html' %}
 
-{% block title %}Документы заказа #{{ order.order_id }}{% endblock %}
+{% block title %}Документы заказа #{{ order.order_id }} - JEWEllUX{% endblock %}
 
 {% block content %}
-<!-- ИНФОРМАЦИЯ О ЗАКАЗЕ -->
-<div class="card mb-4 shadow">
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h3 class="mb-2">📋 Документы заказа #{{ order.order_id }}</h3>
-                <p class="mb-1">
-                    <strong>Клиент:</strong> {{ order.customer.name }} {{ order.customer.surname }}
-                </p>
-                <p class="mb-0">
-                    <strong>Статус:</strong> 
-                    <span class="badge 
-                        {% if order.order_status == 'new' %}bg-primary
-                        {% elif order.order_status == 'confirmed' %}bg-info
-                        {% elif order.order_status == 'in_work' %}bg-warning
-                        {% elif order.order_status == 'ready' %}bg-success
-                        {% elif order.order_status == 'delivered' %}bg-secondary
-                        {% endif %}
-                    ">
-                        {{ order.get_status_display_ru }}
-                    </span>
-                </p>
-            </div>
-            <div class="col-md-4 text-end">
-                <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary mb-2">
-                    ← Назад к заказу
+<section class="documents-section">
+    <div class="container-documents">
+        
+        <!-- HEADER -->
+        <div class="documents-header">
+            <div class="header-left">
+                <a href="{% url 'order_detail' order.order_id %}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Назад к заказу
                 </a>
-                {% if user.role == 'manager' %}
-                <a href="{% url 'document_create' order.order_id %}" class="btn btn-primary mb-2">
+                <h1 class="documents-title">
+                    <i class="bi bi-file-earmark-text"></i>
+                    Документы заказа #{{ order.order_id }}
+                </h1>
+            </div>
+            
+            {% if user.role == 'manager' %}
+            <div class="header-actions">
+                <a href="{% url 'document_create' order.order_id %}" class="btn-gold">
                     <i class="bi bi-plus-circle"></i> Создать документ
                 </a>
-                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ИНФОРМАЦИЯ О ЗАКАЗЕ (мини-карточка) -->
+        <div class="order-info-mini">
+            <div class="info-mini-item">
+                <i class="bi bi-person"></i>
+                <span><strong>Клиент:</strong> {{ order.customer.name }} {{ order.customer.surname }}</span>
+            </div>
+            <div class="info-mini-item">
+                <i class="bi bi-diagram-3"></i>
+                <span>
+                    <strong>Статус:</strong>
+                    <span class="status-badge status-{{ order.order_status }}">
+                        {{ order.get_status_display_ru }}
+                    </span>
+                </span>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- СПИСОК ДОКУМЕНТОВ -->
-<h4 class="mb-3">📄 Список документов ({{ documents|length }})</h4>
-
-{% if documents %}
-<div class="row">
-    {% for document in documents %}
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <h5 class="card-title mb-0">
-                        {{ document.get_document_type_display_icon }} {{ document.get_document_type_display }}
-                    </h5>
-                    <span class="badge bg-secondary">№{{ document.document_number }}</span>
-                </div>
-                
-                <p class="mb-2">
-                    <strong>Дата:</strong> {{ document.document_date|date:"d.m.Y" }}
-                </p>
-                
-                {% if document.amount %}
-                <p class="mb-2">
-                    <strong>Сумма:</strong> <span class="text-success fs-5">{{ document.amount }} ₽</span>
-                </p>
-                {% endif %}
-                
-                {% if document.description %}
-                <p class="mb-2 text-muted">
-                    {{ document.description|truncatewords:20 }}
-                </p>
-                {% endif %}
-                
-                <p class="mb-3 small text-muted">
-                    <strong>Создан:</strong> {{ document.uploaded_at|date:"d.m.Y H:i" }}
-                    {% if document.created_by %}
-                    <br><strong>Автор:</strong> {{ document.created_by.get_full_name|default:document.created_by.username }}
-                    {% endif %}
-                </p>
-                
-                <div class="d-flex gap-2">
-                    <!-- Кнопка PDF для ВСЕХ -->
-                    <a href="{% url 'document_export_pdf' document.document_id %}" class="btn btn-sm btn-success">
-                        <i class="bi bi-download"></i> PDF
-                    </a>
+        <!-- СПИСОК ДОКУМЕНТОВ -->
+        {% if documents %}
+        <div class="documents-grid">
+            {% for document in documents %}
+            <div class="document-card">
+                <div class="document-header">
+                    <div class="document-type-icon">
+                        {% if document.document_type == 'contract' %}
+                            <i class="bi bi-file-earmark-text"></i>
+                        {% elif document.document_type == 'invoice' %}
+                            <i class="bi bi-receipt"></i>
+                        {% elif document.document_type == 'sketch' %}
+                            <i class="bi bi-image"></i>
+                        {% elif document.document_type == 'certificate' %}
+                            <i class="bi bi-award"></i>
+                        {% else %}
+                            <i class="bi bi-file"></i>
+                        {% endif %}
+                    </div>
                     
-                    <!-- Редактирование и удаление только для менеджера -->
-                    {% if user.role == 'manager' %}
-                    <a href="{% url 'document_update' document.document_id %}" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i> Редактировать
-                    </a>
-                    <a href="{% url 'document_delete' document.document_id %}" 
-                    class="btn btn-sm btn-danger"
-                    onclick="return confirm('Вы уверены что хотите удалить этот документ?')">
-                        <i class="bi bi-trash"></i> Удалить
-                    </a>
+                    <div class="document-info">
+                        <h3 class="document-title">
+                            {% if document.document_type == 'contract' %}📄 Договор
+                            {% elif document.document_type == 'invoice' %}🧾 Счет
+                            {% elif document.document_type == 'sketch' %}🎨 Эскиз
+                            {% elif document.document_type == 'certificate' %}🏆 Сертификат
+                            {% else %}📎 Документ{% endif %}
+                        </h3>
+                        
+                        {% if document.document_date %}
+                        <p class="document-date">
+                            <i class="bi bi-calendar3"></i>
+                            {{ document.document_date|date:"d.m.Y" }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="document-body">
+                    {% if document.amount %}
+                    <div class="document-amount">
+                        <span class="amount-label">Сумма:</span>
+                        <span class="amount-value">{{ document.amount }} ₽</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if document.description %}
+                    <p class="document-description">{{ document.description|truncatewords:20 }}</p>
                     {% endif %}
                 </div>
+                
+                <div class="document-footer">
+                    <div class="document-meta">
+                        <span class="meta-item">
+                            <i class="bi bi-clock"></i>
+                            {{ document.uploaded_at|date:"d.m.Y H:i" }}
+                        </span>
+                        
+                        {% if document.created_by %}
+                        <span class="meta-item">
+                            <i class="bi bi-person-circle"></i>
+                            {{ document.created_by.get_full_name|default:document.created_by.username }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="document-actions">
+                        <a href="{% url 'document_export_pdf' document.pk %}" 
+                           class="btn-doc-action btn-view"
+                           title="Скачать PDF">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        
+                        {% if user.role == 'manager' %}
+                        <a href="{% url 'document_update' document.pk %}" 
+                           class="btn-doc-action btn-edit"
+                           title="Редактировать">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        
+                        <a href="{% url 'document_delete' document.pk %}" 
+                           class="btn-doc-action btn-delete"
+                           title="Удалить"
+                           onclick="return confirm('Удалить этот документ?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
+        
+        <p class="documents-count">Всего документов: {{ documents|length }}</p>
+        
+        {% else %}
+        <!-- ПУСТОЕ СОСТОЯНИЕ -->
+        <div class="no-documents">
+            <i class="bi bi-folder2-open"></i>
+            <h3>К этому заказу пока не прикреплено ни одного документа</h3>
+            {% if user.role == 'manager' %}
+            <p>Создайте первый документ для заказа</p>
+            <a href="{% url 'document_create' order.order_id %}" class="btn-gold btn-lg">
+                <i class="bi bi-plus-circle"></i> Создать первый документ
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
     </div>
-    {% endfor %}
-</div>
-{% else %}
-<div class="alert alert-info text-center">
-    <h4>Документы не найдены</h4>
-    <p>К этому заказу пока не прикреплено ни одного документа</p>
-    {% if user.role == 'manager' %}
-    <a href="{% url 'document_create' order.order_id %}" class="btn btn-primary">
-        Создать первый документ
-    </a>
-    {% endif %}
-</div>
-{% endif %}
+</section>
 {% endblock %}

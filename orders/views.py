@@ -14,6 +14,7 @@ from django.http import FileResponse
 from .reports import generate_report_data, generate_report_pdf
 from datetime import datetime, timedelta
 
+
 @login_required
 def order_list(request):
     """Список заказов (доступно всем авторизованным)"""
@@ -56,7 +57,7 @@ def order_create(request):
     else:
         form = OrderCreateForm()
     
-    return render(request, 'orders/order_create_new.html', {'form': form})
+    return render(request, 'orders/order_create.html', {'form': form})
 
 
 @login_required

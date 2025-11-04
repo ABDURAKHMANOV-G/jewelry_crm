@@ -1,76 +1,712 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Создать заказ{% endblock %}
+{% block title %}Создать заказ - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h3>💎 Создание нового заказа</h3>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    {% csrf_token %}
+<section class="create-order-section">
+    <div class="container-create">
+        
+        <!-- HEADER -->
+        <div class="create-header">
+            <a href="{% url 'order_list' %}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Назад к заказам
+            </a>
+            <h1 class="create-title">
+                <i class="bi bi-plus-circle"></i>
+                Создать новый заказ
+            </h1>
+        </div>
+
+        <!-- ФОРМА (без инфобокса справа) -->
+        <div class="create-form">
+            <form method="POST" enctype="multipart/form-data" id="orderForm">
+                {% csrf_token %}
+                
+                <!-- СЕКЦИЯ 1: Основная информация -->
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="bi bi-info-circle"></i>
+                        Основная информация
+                    </h2>
                     
-                    <!-- Выбор изделий -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Выберите изделия *</label>
-                        <div class="row">
-                            {% for product in form.products.field.queryset %}
-                            <div class="col-md-6 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="products" value="{{ product.product_id }}" 
-                                           id="product_{{ product.product_id }}">
-                                    <label class="form-check-label" for="product_{{ product.product_id }}">
-                                        <strong>{{ product.name }}</strong><br>
-                                        <small class="text-muted">{{ product.material }} - {{ product.price }} ₽</small>
-                                    </label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_product_type">Тип изделия *</label>
+                            {{ form.product_type }}
+                            {% if form.product_type.errors %}
+                            <span class="form-error">{{ form.product_type.errors|first }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_order_type">Тип заказа *</label>
+                            <select id="id_order_type" name="order_type" class="form-control" onchange="toggleOrderType()">
+                                <option value="">Выберите тип заказа</option>
+                                <option value="template">📋 Шаблонный</option>
+                                <option value="custom">✏️ Индивидуальный</option>
+                            </select>
+                            {% if form.order_type.errors %}
+                            <span class="form-error">{{ form.order_type.errors|first }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- СЕКЦИЯ 2: ШАБЛОННЫЙ ЗАКАЗ -->
+                <div id="templateSection" class="form-section" style="display: none;">
+                    <h2 class="form-section-title">
+                        <i class="bi bi-bookmark"></i>
+                        Выберите шаблон
+                    </h2>
+                    
+                    <!-- КАРУСЕЛЬ ШАБЛОНОВ -->
+                    <div class="template-carousel-wrapper">
+                        <p class="carousel-hint">Выберите понравившийся дизайн</p>
+                        
+                        <div class="template-carousel-container">
+                            <button class="carousel-btn-template prev" id="prevBtnTemplate" type="button">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            
+                            <div class="carousel-track-container-template">
+                                <!-- КАРУСЕЛЬ ДЛЯ КОЛЕЦ -->
+                                <div class="carousel-track-template" id="carouselRings" data-type="ring" style="display: none;">
+                                    <div class="carousel-slide-template" data-template="ring1">
+                                        <img src="{% static 'images/example1.png' %}" alt="Кольцо 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Классика</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="ring2">
+                                        <img src="{% static 'images/example3.png' %}" alt="Кольцо 2">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Винтаж</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="ring3">
+                                        <img src="{% static 'images/example4.png' %}" alt="Кольцо 3">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Романтик</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="ring1">
+                                        <img src="{% static 'images/example2.png' %}" alt="Кольцо 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Классика</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="ring1">
+                                        <img src="{% static 'images/example5.png' %}" alt="Кольцо 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Классика</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="ring1">
+                                        <img src="{% static 'images/example_trans1.png' %}" alt="Кольцо 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Классика</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- КАРУСЕЛЬ ДЛЯ БРОШЕЙ -->
+                                <div class="carousel-track-template" id="carouselBrooches" data-type="brooch" style="display: none;">
+                                    <div class="carousel-slide-template" data-template="brooch1">
+                                        <img src="{% static 'images/example_trans1.png' %}" alt="Брошь 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Цветок</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="brooch2">
+                                        <img src="{% static 'images/example2.png' %}" alt="Брошь 2">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Бабочка</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- КАРУСЕЛЬ ДЛЯ БРАСЛЕТОВ -->
+                                <div class="carousel-track-template" id="carouselBracelets" data-type="bracelet" style="display: none;">
+                                    <div class="carousel-slide-template" data-template="bracelet1">
+                                        <img src="{% static 'images/example2.png' %}" alt="Браслет 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Элегант</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="bracelet2">
+                                        <img src="{% static 'images/example5.png' %}" alt="Браслет 2">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Модерн</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- КАРУСЕЛЬ ДЛЯ СЕРЁГ -->
+                                <div class="carousel-track-template" id="carouselEarrings" data-type="earrings" style="display: none;">
+                                    <div class="carousel-slide-template" data-template="earring1">
+                                        <img src="{% static 'images/example5.png' %}" alt="Серьги 1">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Капли</span>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-slide-template" data-template="earring2">
+                                        <img src="{% static 'images/example_trans1.png' %}" alt="Серьги 2">
+                                        <div class="template-overlay">
+                                            <span class="template-name">Премиум</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            {% endfor %}
+                            
+                            <button class="carousel-btn-template next" id="nextBtnTemplate" type="button">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
                         </div>
-                        {% if form.products.errors %}
-                            <div class="text-danger mt-2">{{ form.products.errors }}</div>
+                        
+                        <!-- Скрытое поле для хранения выбранного шаблона -->
+                        <input type="hidden" id="id_template_image" name="template_image" value="">
+                        <div class="selected-template-info" id="selectedTemplateInfo" style="display: none;">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Выбран шаблон: <strong id="selectedTemplateName"></strong></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Размер кольца (только для колец) - ПОД КАРУСЕЛЬЮ -->
+                    <div class="form-group" id="templateRingSizeGroup" style="display: none; margin-top: 24px;">
+                        <label for="id_ring_size">Размер кольца *</label>
+                        {{ form.ring_size }}
+                        <small class="form-hint">Укажите размер для точной посадки</small>
+                    </div>
+                </div>
+
+                <!-- дальше идут остальные секции -->
+
+                <!-- СЕКЦИЯ 3: ИНДИВИДУАЛЬНЫЙ ЗАКАЗ -->
+                <div id="customSection" class="form-section" style="display: none;">
+                    <h2 class="form-section-title">
+                        <i class="bi bi-sliders"></i>
+                        Параметры изделия
+                    </h2>
+                    
+                    <div class="form-row form-row-4">
+                        <div class="form-group">
+                            <label for="id_custom_size">Размер *</label>
+                            <input type="text" id="id_custom_size" name="ring_size" class="form-control" placeholder="Например: 17">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_thickness">Толщина (мм) *</label>
+                            {{ form.thickness }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_width">Ширина (мм) *</label>
+                            {{ form.width }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_stone_size">Размер камня (карат) *</label>
+                            {{ form.stone_size }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_desired_weight">Желаемый вес (г) *</label>
+                        {{ form.desired_weight }}
+                    </div>
+                </div>
+
+                <!-- СЕКЦИЯ 4: МАТЕРИАЛ И КОММЕНТАРИЙ -->
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="bi bi-palette"></i>
+                        Материал и детали
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="id_material">Материал *</label>
+                        {{ form.material }}
+                        {% if form.material.errors %}
+                        <span class="form-error">{{ form.material.errors|first }}</span>
                         {% endif %}
                     </div>
-
-                    <!-- Бюджет -->
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.budget.label }}</label>
-                        {{ form.budget }}
-                        {% if form.budget.errors %}
-                            <div class="text-danger">{{ form.budget.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Срок -->
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.required_by.label }} *</label>
-                        {{ form.required_by }}
-                        {% if form.required_by.errors %}
-                            <div class="text-danger">{{ form.required_by.errors }}</div>
-                        {% endif %}
-                        <small class="form-text text-muted">Когда вам нужно получить готовое изделие</small>
-                    </div>
-
-                    <!-- Комментарий -->
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.comment.label }}</label>
+                    
+                    <div class="form-group">
+                        <label for="id_comment">Комментарий или особые пожелания</label>
                         {{ form.comment }}
-                        {% if form.comment.errors %}
-                            <div class="text-danger">{{ form.comment.errors }}</div>
-                        {% endif %}
+                        <small class="form-hint">Опишите все детали и требования к изделию</small>
                     </div>
+                </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'order_list' %}" class="btn btn-secondary">Отмена</a>
-                        <button type="submit" class="btn btn-primary">Создать заказ</button>
+                <!-- СЕКЦИЯ 5: ФИНАНСЫ И СРОКИ -->
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="bi bi-calendar3-event"></i>
+                        Финансы и сроки
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_budget">Бюджет (₽) *</label>
+                            {{ form.budget }}
+                            {% if form.budget.errors %}
+                            <span class="form-error">{{ form.budget.errors|first }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_required_by">Желаемая дата готовности *</label>
+                            {{ form.required_by }}
+                            {% if form.required_by.errors %}
+                            <span class="form-error">{{ form.required_by.errors|first }}</span>
+                            {% endif %}
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <!-- КНОПКИ ДЕЙСТВИЙ -->
+                <div class="form-actions">
+                    <a href="{% url 'order_list' %}" class="btn-cancel">
+                        <i class="bi bi-x-circle"></i> Отмена
+                    </a>
+                    <button type="submit" class="btn-gold btn-submit">
+                        <i class="bi bi-check-circle"></i> Создать заказ
+                    </button>
+                </div>
+            </form>
         </div>
+
     </div>
-</div>
+</section>
+
+<script>
+// ========================================
+// TOGGLE ORDER TYPE (Template/Custom)
+// ========================================
+function toggleOrderType() {
+    const orderType = document.getElementById('id_order_type').value;
+    const templateSection = document.getElementById('templateSection');
+    const customSection = document.getElementById('customSection');
+    const productType = document.getElementById('id_product_type').value;
+    const templateRingSizeGroup = document.getElementById('templateRingSizeGroup');
+    
+    if (templateSection) templateSection.style.display = 'none';
+    if (customSection) customSection.style.display = 'none';
+    
+    if (orderType === 'template') {
+        if (templateSection) templateSection.style.display = 'block';
+        initTemplateCarousel();
+        
+        if (productType === 'ring' && templateRingSizeGroup) {
+            templateRingSizeGroup.style.display = 'block';
+        } else if (templateRingSizeGroup) {
+            templateRingSizeGroup.style.display = 'none';
+        }
+    } else if (orderType === 'custom') {
+        if (customSection) customSection.style.display = 'block';
+    }
+}
+
+// ========================================
+// INIT TEMPLATE CAROUSEL
+// ========================================
+function initTemplateCarousel() {
+    const productType = document.getElementById('id_product_type').value;
+    
+    const carouselMapping = {
+        'ring': 'carouselRings',
+        'brooch': 'carouselBrooches',
+        'bracelet': 'carouselBracelets',
+        'earrings': 'carouselEarrings'
+    };
+    
+    const carouselId = carouselMapping[productType];
+    if (!carouselId) return;
+    
+    document.querySelectorAll('.carousel-track-template').forEach(track => {
+        track.style.display = 'none';
+    });
+    
+    const track = document.getElementById(carouselId);
+    if (!track) return;
+    
+    track.style.display = 'flex';
+    setupInfiniteCarousel(track);
+}
+
+// ========================================
+// INFINITE CAROUSEL - Бесконечная карусель
+// ========================================
+function setupInfiniteCarousel(track) {
+    const prevBtn = document.getElementById('prevBtnTemplate');
+    const nextBtn = document.getElementById('nextBtnTemplate');
+    const templateInput = document.getElementById('id_template_image');
+    const selectedInfo = document.getElementById('selectedTemplateInfo');
+    const selectedNameSpan = document.getElementById('selectedTemplateName');
+    
+    if (!track || !prevBtn || !nextBtn) return;
+    
+    // Получаем только оригинальные слайды (без клонов)
+    const originalSlides = Array.from(track.children).filter(s => !s.classList.contains('carousel-cloned'));
+    
+    if (originalSlides.length < 2) {
+        console.warn('Карусель требует минимум 2 изображения');
+        return;
+    }
+    
+    // Удаляем старые клоны
+    track.querySelectorAll('.carousel-cloned').forEach(c => c.remove());
+    
+    // Клонируем слайды для бесконечной прокрутки
+    // Добавляем копии в конец
+    originalSlides.forEach(slide => {
+        const clone = slide.cloneNode(true);
+        clone.classList.add('carousel-cloned');
+        track.appendChild(clone);
+    });
+    
+    // Добавляем копии в начало
+    originalSlides.slice().reverse().forEach(slide => {
+        const clone = slide.cloneNode(true);
+        clone.classList.add('carousel-cloned');
+        track.insertBefore(clone, track.firstChild);
+    });
+    
+    const allSlides = Array.from(track.children);
+    const slideWidth = allSlides[0].getBoundingClientRect().width + 16; // +16 для gap
+    const totalOriginalSlides = originalSlides.length;
+    
+    let currentIndex = totalOriginalSlides; // Начинаем с первого оригинального слайда
+    let isTransitioning = false;
+    
+    // Устанавливаем начальную позицию
+    updateCarouselPosition(false);
+    
+    // Удаляем старые обработчики
+    const newPrevBtn = prevBtn.cloneNode(true);
+    const newNextBtn = nextBtn.cloneNode(true);
+    prevBtn.replaceWith(newPrevBtn);
+    nextBtn.replaceWith(newNextBtn);
+    
+    // ========================================
+    // НАВИГАЦИЯ
+    // ========================================
+    
+    // Следующий слайд
+    newNextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isTransitioning) return;
+        moveToNext();
+    });
+    
+    // Предыдущий слайд
+    newPrevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isTransitioning) return;
+        moveToPrev();
+    });
+    
+    function moveToNext() {
+        isTransitioning = true;
+        currentIndex++;
+        updateCarouselPosition(true);
+        
+        // Если достигли конца клонов, мгновенно перемещаемся к началу оригиналов
+        if (currentIndex >= totalOriginalSlides * 2) {
+            setTimeout(() => {
+                currentIndex = totalOriginalSlides;
+                updateCarouselPosition(false);
+                isTransitioning = false;
+            }, 500); // Совпадает с transition duration
+        } else {
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+    }
+    
+    function moveToPrev() {
+        isTransitioning = true;
+        currentIndex--;
+        updateCarouselPosition(true);
+        
+        // Если достигли начала клонов, мгновенно перемещаемся к концу оригиналов
+        if (currentIndex < totalOriginalSlides) {
+            setTimeout(() => {
+                currentIndex = totalOriginalSlides * 2 - 1;
+                updateCarouselPosition(false);
+                isTransitioning = false;
+            }, 500);
+        } else {
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+    }
+    
+    // Обновление позиции карусели
+    function updateCarouselPosition(animate) {
+        const moveDistance = currentIndex * slideWidth;
+        
+        if (animate) {
+            track.style.transition = 'transform 0.5s ease-in-out';
+        } else {
+            track.style.transition = 'none';
+        }
+        
+        track.style.transform = `translateX(-${moveDistance}px)`;
+    }
+    
+    // ========================================
+    // ВЫБОР ШАБЛОНА
+    // ========================================
+    allSlides.forEach(slide => {
+        slide.addEventListener('click', function() {
+            allSlides.forEach(s => s.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            const templateId = this.getAttribute('data-template');
+            const templateName = this.querySelector('.template-name')?.textContent;
+            
+            if (templateInput) {
+                templateInput.value = templateId;
+            }
+            
+            if (selectedInfo && selectedNameSpan && templateName) {
+                selectedInfo.style.display = 'flex';
+                selectedNameSpan.textContent = templateName;
+            }
+        });
+    });
+}
+
+// ========================================
+// FORM VALIDATION (С ВАЛИДАЦИЕЙ ВСЕХ ПОЛЕЙ)
+// ========================================
+function validateForm() {
+    let isValid = true;
+    const errors = [];
+    
+    const productType = document.getElementById('id_product_type');
+    const orderType = document.getElementById('id_order_type');
+    const material = document.getElementById('id_material');
+    const budget = document.getElementById('id_budget');
+    const requiredBy = document.getElementById('id_required_by');
+    const templateImage = document.getElementById('id_template_image');
+    const ringSize = document.getElementById('id_ring_size');
+    
+    // Поля для индивидуального заказа
+    const thickness = document.getElementById('id_thickness');
+    const width = document.getElementById('id_width');
+    const stoneSize = document.getElementById('id_stone_size');
+    const desiredWeight = document.getElementById('id_desired_weight');
+    
+    // Валидация: Тип изделия
+    if (!productType || !productType.value) {
+        showError(productType, 'Выберите тип изделия');
+        errors.push('Тип изделия обязателен');
+        isValid = false;
+    } else {
+        clearError(productType);
+    }
+    
+    // Валидация: Тип заказа
+    if (!orderType || !orderType.value) {
+        showError(orderType, 'Выберите тип заказа');
+        errors.push('Тип заказа обязателен');
+        isValid = false;
+    } else {
+        clearError(orderType);
+        
+        // ========================================
+        // ВАЛИДАЦИЯ ДЛЯ ШАБЛОННОГО ЗАКАЗА
+        // ========================================
+        if (orderType.value === 'template') {
+            // Проверка выбора шаблона
+            if (!templateImage || !templateImage.value) {
+                errors.push('Выберите шаблон из карусели');
+                isValid = false;
+            }
+            
+            // Проверка размера кольца для колец
+            if (productType.value === 'ring') {
+                if (!ringSize || !ringSize.value) {
+                    showError(ringSize, 'Укажите размер кольца');
+                    errors.push('Размер кольца обязателен для колец');
+                    isValid = false;
+                } else {
+                    clearError(ringSize);
+                }
+            }
+        }
+        // ========================================
+        // ВАЛИДАЦИЯ ДЛЯ ИНДИВИДУАЛЬНОГО ЗАКАЗА
+        // ========================================
+        if (orderType.value === 'custom') {
+            // Размер (используем отдельное поле для индивидуального заказа)
+            const customSize = document.getElementById('id_custom_size');
+            if (!customSize || !customSize.value || customSize.value.trim() === '') {
+                showError(customSize, 'Укажите размер');
+                errors.push('Размер обязателен');
+                isValid = false;
+            } else {
+                clearError(customSize);
+            }
+            
+            // Толщина (обязательно, должна быть числом > 0)
+            const thicknessValue = parseFloat(thickness?.value);
+            if (!thickness || !thickness.value || thickness.value.trim() === '' || isNaN(thicknessValue) || thicknessValue <= 0) {
+                showError(thickness, 'Укажите толщину (число больше 0)');
+                errors.push('Толщина обязательна и должна быть больше 0');
+                isValid = false;
+            } else {
+                clearError(thickness);
+            }
+            
+            // Ширина (обязательно, должна быть числом > 0)
+            const widthValue = parseFloat(width?.value);
+            if (!width || !width.value || width.value.trim() === '' || isNaN(widthValue) || widthValue <= 0) {
+                showError(width, 'Укажите ширину (число больше 0)');
+                errors.push('Ширина обязательна и должна быть больше 0');
+                isValid = false;
+            } else {
+                clearError(width);
+            }
+            
+            // Размер камня (обязательно, должно быть числом > 0)
+            const stoneSizeValue = parseFloat(stoneSize?.value);
+            if (!stoneSize || !stoneSize.value || stoneSize.value.trim() === '' || isNaN(stoneSizeValue) || stoneSizeValue <= 0) {
+                showError(stoneSize, 'Укажите размер камня (число больше 0)');
+                errors.push('Размер камня обязателен и должен быть больше 0');
+                isValid = false;
+            } else {
+                clearError(stoneSize);
+            }
+            
+            // Желаемый вес (обязательно, должен быть числом > 0)
+            const desiredWeightValue = parseFloat(desiredWeight?.value);
+            if (!desiredWeight || !desiredWeight.value || desiredWeight.value.trim() === '' || isNaN(desiredWeightValue) || desiredWeightValue <= 0) {
+                showError(desiredWeight, 'Укажите желаемый вес (число больше 0)');
+                errors.push('Желаемый вес обязателен и должен быть больше 0');
+                isValid = false;
+            } else {
+                clearError(desiredWeight);
+            }
+        }
+
+    }
+    
+    // Валидация: Материал
+    if (!material || !material.value) {
+        showError(material, 'Выберите материал');
+        errors.push('Материал обязателен');
+        isValid = false;
+    } else {
+        clearError(material);
+    }
+    
+    // Валидация: Бюджет
+    if (!budget || !budget.value || parseFloat(budget.value) <= 0) {
+        showError(budget, 'Укажите бюджет (больше 0)');
+        errors.push('Бюджет обязателен и должен быть больше 0');
+        isValid = false;
+    } else {
+        clearError(budget);
+    }
+    
+    // Валидация: Дата готовности
+    if (!requiredBy || !requiredBy.value) {
+        showError(requiredBy, 'Выберите дату готовности');
+        errors.push('Дата готовности обязательна');
+        isValid = false;
+    } else {
+        const selectedDate = new Date(requiredBy.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+            showError(requiredBy, 'Дата должна быть в будущем');
+            errors.push('Дата готовности должна быть в будущем');
+            isValid = false;
+        } else {
+            clearError(requiredBy);
+        }
+    }
+    
+    if (!isValid) {
+        alert('Пожалуйста, заполните все обязательные поля:\n\n' + errors.join('\n'));
+    }
+    
+    return isValid;
+}
+
+
+function showError(field, message) {
+    if (!field) return;
+    field.style.borderColor = '#ff5459';
+    field.style.background = 'rgba(255, 84, 89, 0.05)';
+    
+    const parent = field.closest('.form-group');
+    if (parent) {
+        const oldError = parent.querySelector('.form-error-custom');
+        if (oldError) oldError.remove();
+        
+        const errorDiv = document.createElement('span');
+        errorDiv.className = 'form-error form-error-custom';
+        errorDiv.textContent = message;
+        parent.appendChild(errorDiv);
+    }
+}
+
+function clearError(field) {
+    if (!field) return;
+    field.style.borderColor = '';
+    field.style.background = '';
+    
+    const parent = field.closest('.form-group');
+    if (parent) {
+        const error = parent.querySelector('.form-error-custom');
+        if (error) error.remove();
+    }
+}
+
+// ========================================
+// INITIALIZATION
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    const productTypeSelect = document.getElementById('id_product_type');
+    const orderTypeSelect = document.getElementById('id_order_type');
+    const form = document.getElementById('orderForm');
+    
+    if (productTypeSelect) {
+        productTypeSelect.addEventListener('change', toggleOrderType);
+    }
+    
+    if (orderTypeSelect) {
+        orderTypeSelect.addEventListener('change', toggleOrderType);
+    }
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+    
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearError(this);
+        });
+        input.addEventListener('change', function() {
+            clearError(this);
+        });
+    });
+});
+</script>
+
+
 {% endblock %}

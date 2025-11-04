@@ -1,25 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Удалить заказ{% endblock %}
+{% block title %}Удалить заказ - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white">
-                <h4>Подтверждение удаления</h4>
+<section class="confirm-delete-section">
+    <div class="container-confirm">
+        
+        <div class="confirm-card">
+            <div class="confirm-icon">
+                <i class="bi bi-exclamation-triangle"></i>
             </div>
-            <div class="card-body">
-                <p>Вы действительно хотите удалить заказ <strong>#{{ order.order_id }}</strong>?</p>
-                <p class="text-danger">Это действие нельзя отменить!</p>
+            
+            <h1 class="confirm-title">Подтверждение удаления</h1>
+            
+            <p class="confirm-message">
+                Вы действительно хотите удалить заказ <strong>#{{ order.order_id }}</strong>?
+            </p>
+            
+            <div class="confirm-warning">
+                <i class="bi bi-info-circle"></i>
+                <span>Это действие нельзя отменить! Все данные будут удалены безвозвратно.</span>
+            </div>
+            
+            <form method="POST" class="confirm-form">
+                {% csrf_token %}
                 
-                <form method="POST" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Да, удалить</button>
-                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-secondary">Отмена</a>
-                </form>
-            </div>
+                <div class="confirm-actions">
+                    <a href="{% url 'order_detail' order.order_id %}" class="btn-cancel">
+                        <i class="bi bi-x-circle"></i> Отмена
+                    </a>
+                    
+                    <button type="submit" class="btn-confirm-delete">
+                        <i class="bi bi-trash"></i> Да, удалить заказ
+                    </button>
+                </div>
+            </form>
         </div>
+        
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,389 +1,393 @@
 {% extends 'base.html' %}
 {% load phone_filters %}
 
-{% block title %}Заказ #{{ order.order_id }}{% endblock %}
+{% block title %}Заказ #{{ order.order_id }} - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Заказ #{{ order.order_id }}</h2>
-    <div>
-        <span class="badge 
-            {% if order.order_status == 'new' %}bg-primary
-            {% elif order.order_status == 'confirmed' %}bg-info
-            {% elif order.order_status == 'in_work' %}bg-warning
-            {% elif order.order_status == 'ready' %}bg-success
-            {% elif order.order_status == 'delivered' %}bg-secondary
-            {% endif %}
-        " style="font-size: 1rem; padding: 0.5rem 1rem;">
-            {{ order.get_status_display_ru }}
-        </span>
-    </div>
-</div>
-
-<div class="row">
-    <!-- ЛЕВАЯ КОЛОНКА: Информация о заказе -->
-    <div class="col-md-8">
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">📋 Информация о заказе</h5>
+<section class="order-detail-section">
+    <div class="container-detail">
+        
+        <!-- HEADER с статусом и навигацией -->
+        <div class="detail-header">
+            <div class="detail-title-block">
+                <a href="{% url 'order_list' %}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Назад к заказам
+                </a>
+                <h1 class="detail-title">
+                    <i class="bi bi-file-text"></i>
+                    Заказ #{{ order.order_id }}
+                </h1>
+                <span class="status-badge status-{{ order.order_status }}">
+                    {{ order.get_status_display_ru }}
+                </span>
             </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <h6 class="text-muted mb-2">Тип изделия</h6>
-                        <p class="mb-0">
-                            {% if order.product_type == 'ring' %}
-                                💍 Кольцо
-                            {% elif order.product_type == 'brooch' %}
-                                🌸 Брошь
-                            {% elif order.product_type == 'bracelet' %}
-                                📿 Браслет
-                            {% elif order.product_type == 'earrings' %}
-                                💎 Серьги
-                            {% else %}
-                                -
-                            {% endif %}
-                        </p>
+            
+            <div class="detail-actions">
+                <a href="{% url 'document_list' order.order_id %}" class="btn-action btn-documents">
+                    <i class="bi bi-file-earmark-text"></i> Документы
+                </a>
+                
+                {% if user.role == 'manager' or user.role == 'client' and order.order_status == 'new' %}
+                <a href="{% url 'order_delete' order.order_id %}" 
+                   class="btn-action btn-delete"
+                   onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
+                    <i class="bi bi-trash"></i> Удалить
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- GRID: Левая и правая колонки -->
+        <div class="detail-grid">
+            
+            <!-- ЛЕВАЯ КОЛОНКА: Основная информация о заказе -->
+            <div class="detail-card detail-card-main">
+                <h2 class="card-title">
+                    <i class="bi bi-info-circle"></i>
+                    Информация о заказе
+                </h2>
+                
+                <div class="info-group">
+                    <div class="info-item">
+                        <span class="info-label">Тип изделия</span>
+                        <span class="info-value">
+                            {% if order.product_type == 'ring' %}💍 Кольцо
+                            {% elif order.product_type == 'brooch' %}🌸 Брошь
+                            {% elif order.product_type == 'bracelet' %}📿 Браслет
+                            {% elif order.product_type == 'earrings' %}💎 Серьги
+                            {% else %}-{% endif %}
+                        </span>
                     </div>
                     
-                    <div class="col-md-6">
-                        <h6 class="text-muted mb-2">Тип заказа</h6>
-                        <p class="mb-0">
+                    <div class="info-item">
+                        <span class="info-label">Тип заказа</span>
+                        <span class="info-value">
                             {% if order.order_type == 'template' %}
-                                📋 Шаблонный
+                                <span class="order-type template">📋 Шаблонный</span>
                             {% elif order.order_type == 'custom' %}
-                                ✏️ Индивидуальный
-                            {% else %}
-                                -
-                            {% endif %}
-                        </p>
+                                <span class="order-type custom">✏️ Индивидуальный</span>
+                            {% else %}-{% endif %}
+                        </span>
                     </div>
-                </div>
-
-                <hr>
-
-                <!-- ШАБЛОННЫЙ ЗАКАЗ -->
-                {% if order.order_type == 'template' %}
-                <div class="mb-3">
-                    <h6 class="text-muted mb-2">Выбранный шаблон</h6>
-                    <p class="mb-0">{{ order.template_image|default:"-" }}</p>
-                </div>
-                
-                {% if order.product_type == 'ring' and order.ring_size %}
-                <div class="mb-3">
-                    <h6 class="text-muted mb-2">Размер кольца</h6>
-                    <p class="mb-0">{{ order.ring_size }}</p>
-                </div>
-                {% endif %}
-                {% endif %}
-
-                <!-- ИНДИВИДУАЛЬНЫЙ ЗАКАЗ -->
-                {% if order.order_type == 'custom' %}
-                <div class="card card-body bg-light mb-3">
-                    <h6 class="mb-3">Параметры изделия</h6>
-                    <div class="row">
-                        {% if order.ring_size %}
-                        <div class="col-md-6 mb-2">
-                            <strong>Размер:</strong> {{ order.ring_size }}
-                        </div>
-                        {% endif %}
-                        
-                        {% if order.thickness %}
-                        <div class="col-md-6 mb-2">
-                            <strong>Толщина:</strong> {{ order.thickness }} мм
-                        </div>
-                        {% endif %}
-                        
-                        {% if order.width %}
-                        <div class="col-md-6 mb-2">
-                            <strong>Ширина:</strong> {{ order.width }} мм
-                        </div>
-                        {% endif %}
-                        
-                        {% if order.stone_size %}
-                        <div class="col-md-6 mb-2">
-                            <strong>Размер камня:</strong> {{ order.stone_size }} карат
-                        </div>
-                        {% endif %}
-                        
-                        {% if order.desired_weight %}
-                        <div class="col-md-6 mb-2">
-                            <strong>Желаемый вес:</strong> {{ order.desired_weight }} г
-                        </div>
-                        {% endif %}
+                    
+                    {% if order.material %}
+                    <div class="info-item">
+                        <span class="info-label">Материал</span>
+                        <span class="info-value material">
+                            {% if order.material == 'gold_585' %}⚜️ Золото 585
+                            {% elif order.material == 'gold_750' %}⚜️ Золото 750
+                            {% elif order.material == 'silver_925' %}🔷 Серебро 925
+                            {% elif order.material == 'platinum' %}💎 Платина
+                            {% else %}{{ order.material }}{% endif %}
+                        </span>
                     </div>
-                </div>
-                {% endif %}
-
-                <!-- ОБЩИЕ ПАРАМЕТРЫ -->
-                {% if order.material %}
-                <div class="mb-3">
-                    <h6 class="text-muted mb-2">Материал</h6>
-                    <p class="mb-0">
-                        {% if order.material == 'gold_585' %}
-                            Золото 585
-                        {% elif order.material == 'gold_750' %}
-                            Золото 750
-                        {% elif order.material == 'silver_925' %}
-                            Серебро 925
-                        {% elif order.material == 'platinum' %}
-                            Платина
-                        {% else %}
-                            {{ order.material }}
-                        {% endif %}
-                    </p>
-                </div>
-                {% endif %}
-
-                {% if order.comment %}
-                <div class="mb-3">
-                    <h6 class="text-muted mb-2">Комментарий клиента</h6>
-                    <div class="alert alert-info mb-0">
-                        {{ order.comment }}
-                    </div>
-                </div>
-                {% endif %}
-
-                <hr>
-
-                <div class="row">
+                    {% endif %}
+                    
                     {% if order.budget %}
-                    <div class="col-md-6 mb-2">
-                        <h6 class="text-muted mb-2">Бюджет</h6>
-                        <p class="mb-0 fs-5 text-success"><strong>{{ order.budget }} ₽</strong></p>
+                    <div class="info-item">
+                        <span class="info-label">Бюджет</span>
+                        <span class="info-value budget">{{ order.budget }} ₽</span>
                     </div>
                     {% endif %}
                     
                     {% if order.required_by %}
-                    <div class="col-md-6 mb-2">
-                        <h6 class="text-muted mb-2">Желаемая дата готовности</h6>
-                        <p class="mb-0">{{ order.required_by|date:"d.m.Y H:i" }}</p>
+                    <div class="info-item">
+                        <span class="info-label">Дата готовности</span>
+                        <span class="info-value">{{ order.required_by|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- ПРАВАЯ КОЛОНКА: Клиент -->
+            <div class="detail-card">
+                <h2 class="card-title">
+                    <i class="bi bi-person"></i>
+                    Информация о клиенте
+                </h2>
+                
+                <div class="info-group">
+                    <div class="info-item">
+                        <span class="info-label">Имя</span>
+                        <span class="info-value">{{ order.customer.name }} {{ order.customer.surname }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Телефон</span>
+                        <span class="info-value">
+                            <a href="tel:{{ order.customer.phone }}">{{ order.customer.phone|format_phone }}</a>
+                        </span>
+                    </div>
+                    
+                    {% if order.customer.email %}
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">
+                            <a href="mailto:{{ order.customer.email }}">{{ order.customer.email }}</a>
+                        </span>
                     </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ПРАВАЯ КОЛОНКА: Клиент и управление -->
-    <div class="col-md-4">
-        <!-- ИНФОРМАЦИЯ О КЛИЕНТЕ -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-secondary text-white">
-                <h6 class="mb-0">👤 Клиент</h6>
-            </div>
-            <div class="card-body">
-                <p class="mb-2"><strong>{{ order.customer.name }} {{ order.customer.surname }}</strong></p>
-                <p class="mb-2">
-                    <i class="bi bi-telephone"></i> 
-                    {{ order.customer.phone|format_phone }}
-                </p>
-                <p class="mb-2">
-                    <i class="bi bi-envelope"></i> 
-                    {{ order.customer.email|default:"-" }}
-                </p>
+        <!-- ПАРАМЕТРЫ для CUSTOM заказа -->
+        {% if order.order_type == 'custom' %}
+        <div class="detail-card detail-params">
+            <h2 class="card-title">
+                <i class="bi bi-sliders"></i>
+                Параметры изделия
+            </h2>
+            <div class="params-grid">
+                {% if order.ring_size %}
+                <div class="param-item">
+                    <span class="param-label">Размер</span>
+                    <span class="param-value">{{ order.ring_size }}</span>
+                </div>
+                {% endif %}
+                
+                {% if order.thickness %}
+                <div class="param-item">
+                    <span class="param-label">Толщина</span>
+                    <span class="param-value">{{ order.thickness }} мм</span>
+                </div>
+                {% endif %}
+                
+                {% if order.width %}
+                <div class="param-item">
+                    <span class="param-label">Ширина</span>
+                    <span class="param-value">{{ order.width }} мм</span>
+                </div>
+                {% endif %}
+                
+                {% if order.stone_size %}
+                <div class="param-item">
+                    <span class="param-label">Размер камня</span>
+                    <span class="param-value">{{ order.stone_size }} карат</span>
+                </div>
+                {% endif %}
+                
+                {% if order.desired_weight %}
+                <div class="param-item">
+                    <span class="param-label">Желаемый вес</span>
+                    <span class="param-value">{{ order.desired_weight }} г</span>
+                </div>
+                {% endif %}
             </div>
         </div>
+        {% endif %}
 
-        <!-- МЕНЕДЖЕР/ИСПОЛНИТЕЛЬ -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white">
-                <h6 class="mb-0">⚙️ Управление</h6>
+        <!-- ШАБЛОН для TEMPLATE заказа -->
+        {% if order.order_type == 'template' %}
+        <div class="detail-card">
+            <h2 class="card-title">
+                <i class="bi bi-bookmark"></i>
+                Шаблон
+            </h2>
+            <div class="info-group">
+                <div class="info-item">
+                    <span class="info-label">Выбранный шаблон</span>
+                    <span class="info-value">{{ order.template_image|default:"-" }}</span>
+                </div>
+                
+                {% if order.product_type == 'ring' and order.ring_size %}
+                <div class="info-item">
+                    <span class="info-label">Размер кольца</span>
+                    <span class="info-value">{{ order.ring_size }}</span>
+                </div>
+                {% endif %}
             </div>
-            <div class="card-body">
-                <p class="mb-2">
-                    <strong>Исполнитель:</strong><br>
+        </div>
+        {% endif %}
+
+        <!-- КОММЕНТАРИЙ клиента -->
+        {% if order.comment %}
+        <div class="detail-card detail-description">
+            <h2 class="card-title">
+                <i class="bi bi-chat-left-text"></i>
+                Комментарий клиента
+            </h2>
+            <p class="description-text">{{ order.comment }}</p>
+        </div>
+        {% endif %}
+
+        <!-- ИСПОЛНИТЕЛЬ И ДАТЫ -->
+        <div class="detail-grid detail-meta">
+            <div class="detail-card">
+                <h2 class="card-title">
+                    <i class="bi bi-person-workspace"></i>
+                    Исполнитель
+                </h2>
+                <div class="info-item">
                     {% if order.user %}
-                        {{ order.user.get_full_name|default:order.user.username }}
+                        <span class="info-value">{{ order.user.get_full_name|default:order.user.username }}</span>
                     {% else %}
-                        <span class="text-muted">Не назначен</span>
+                        <span class="info-value muted">Не назначен</span>
                     {% endif %}
-                </p>
-                
-                <p class="mb-2">
-                    <strong>Создан:</strong><br>
-                    {{ order.created_at|date:"d.m.Y H:i" }}
-                </p>
-                
-                <p class="mb-0">
-                    <strong>Обновлен:</strong><br>
-                    {{ order.updated_at|date:"d.m.Y H:i" }}
-                </p>
+                </div>
+            </div>
+            
+            <div class="detail-card">
+                <h2 class="card-title">
+                    <i class="bi bi-clock-history"></i>
+                    Даты
+                </h2>
+                <div class="info-group">
+                    <div class="info-item">
+                        <span class="info-label">Создан</span>
+                        <span class="info-value">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Обновлен</span>
+                        <span class="info-value">{{ order.updated_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ДЕЙСТВИЯ -->
-        <div class="card shadow">
-            <div class="card-body">
-                <a href="{% url 'order_list' %}" class="btn btn-secondary w-100 mb-2">
-                    ← Назад к списку
-                </a>
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ДЛЯ МЕНЕДЖЕРА -->
+        {% if user.role == 'manager' %}
+        <div class="detail-card manager-edit-card">
+            <h2 class="card-title">
+                <i class="bi bi-pencil-square"></i>
+                Редактирование заказа (менеджер)
+            </h2>
+            
+            <form method="POST" id="managerEditForm" class="manager-form">
+                {% csrf_token %}
                 
-                <!-- НОВАЯ КНОПКА: Документы -->
-                <a href="{% url 'document_list' order.order_id %}" class="btn btn-info w-100 mb-2">
-                    📄 Документы заказа
-                </a>
+                <!-- Статус и исполнитель -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_order_status">Статус заказа</label>
+                        {{ update_form.order_status }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_user">Исполнитель</label>
+                        {{ update_form.user }}
+                    </div>
+                </div>
                 
-                {% if user.role == 'client' and order.order_status == 'new' %}
-                <a href="{% url 'order_delete' order.order_id %}" 
-                class="btn btn-danger w-100"
-                onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
-                    🗑️ Удалить заказ
-                </a>
-                {% endif %}
-
-                {% if user.role == 'manager' %}
-                <a href="{% url 'order_delete' order.order_id %}" 
-                class="btn btn-danger w-100"
-                onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
-                    🗑️ Удалить заказ
-                </a>
-                {% endif %}
-            </div>
+                <div class="form-divider"></div>
+                
+                <!-- Тип изделия и тип заказа -->
+                <h3 class="form-section-title">Основные параметры</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_product_type">Тип изделия</label>
+                        {{ update_form.product_type }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_order_type_edit">Тип заказа</label>
+                        <select name="order_type" id="id_order_type_edit" class="form-control">
+                            <option value="">------</option>
+                            <option value="template" {% if order.order_type == 'template' %}selected{% endif %}>Шаблонный</option>
+                            <option value="custom" {% if order.order_type == 'custom' %}selected{% endif %}>Индивидуальный</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- ШАБЛОННЫЙ ЗАКАЗ -->
+                <div id="templateEditSection" style="display: none;">
+                    <div class="form-divider"></div>
+                    <h3 class="form-section-title">📋 Параметры шаблонного заказа</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_template_image">Изображение шаблона</label>
+                            {{ update_form.template_image }}
+                        </div>
+                        
+                        <div class="form-group" id="templateRingSizeEdit">
+                            <label for="id_ring_size">Размер кольца</label>
+                            {{ update_form.ring_size }}
+                            <small class="form-hint">Только для колец</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_material">Материал</label>
+                        {{ update_form.material }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_comment">Комментарий</label>
+                        {{ update_form.comment }}
+                    </div>
+                </div>
+                
+                <!-- ИНДИВИДУАЛЬНЫЙ ЗАКАЗ -->
+                <div id="customEditSection" style="display: none;">
+                    <div class="form-divider"></div>
+                    <h3 class="form-section-title">✏️ Параметры индивидуального заказа</h3>
+                    
+                    <div class="form-row form-row-3">
+                        <div class="form-group">
+                            <label for="id_ring_size">Размер</label>
+                            {{ update_form.ring_size }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_thickness">Толщина (мм)</label>
+                            {{ update_form.thickness }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_width">Ширина (мм)</label>
+                            {{ update_form.width }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_stone_size">Размер камня (карат)</label>
+                            {{ update_form.stone_size }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_desired_weight">Желаемый вес (г)</label>
+                            {{ update_form.desired_weight }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_material">Материал</label>
+                        {{ update_form.material }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_comment">Комментарий</label>
+                        {{ update_form.comment }}
+                    </div>
+                </div>
+                
+                <div class="form-divider"></div>
+                
+                <!-- Бюджет и срок -->
+                <h3 class="form-section-title">💰 Финансы и сроки</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_budget">Бюджет (₽)</label>
+                        {{ update_form.budget }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_required_by">Желаемая дата готовности</label>
+                        {{ update_form.required_by }}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-gold btn-lg-full">
+                    <i class="bi bi-save"></i> Сохранить изменения
+                </button>
+            </form>
         </div>
+        {% endif %}
 
-
-<!-- ФОРМА РЕДАКТИРОВАНИЯ ДЛЯ МЕНЕДЖЕРА -->
-{% if user.role == 'manager' %}
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card shadow">
-            <div class="card-header bg-warning">
-                <h5 class="mb-0">✏️ Редактирование заказа (только для менеджера)</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" id="managerEditForm">
-                    {% csrf_token %}
-                    
-                    <!-- Статус и исполнитель -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.order_status.label_tag }}
-                            {{ update_form.order_status }}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.user.label_tag }}
-                            {{ update_form.user }}
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Тип изделия и тип заказа -->
-                    <h6 class="mb-3">Основные параметры</h6>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.product_type.label_tag }}
-                            {{ update_form.product_type }}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.order_type.label_tag }}
-                            <select name="order_type" id="id_order_type_edit" class="form-control">
-                                <option value="">------</option>
-                                <option value="template" {% if order.order_type == 'template' %}selected{% endif %}>Шаблонный</option>
-                                <option value="custom" {% if order.order_type == 'custom' %}selected{% endif %}>Индивидуальный</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- БЛОК: Шаблонный заказ -->
-                    <div id="templateEditSection" style="display: none;">
-                        <hr>
-                        <h6 class="mb-3">📋 Параметры шаблонного заказа</h6>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ update_form.template_image.label_tag }}
-                                {{ update_form.template_image }}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3" id="templateRingSizeEdit">
-                                {{ update_form.ring_size.label_tag }}
-                                {{ update_form.ring_size }}
-                                <small class="form-text text-muted">Только для колец</small>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ update_form.material.label_tag }}
-                            {{ update_form.material }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ update_form.comment.label_tag }}
-                            {{ update_form.comment }}
-                        </div>
-                    </div>
-                    
-                    <!-- БЛОК: Индивидуальный заказ -->
-                    <div id="customEditSection" style="display: none;">
-                        <hr>
-                        <h6 class="mb-3">✏️ Параметры индивидуального заказа</h6>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                {{ update_form.ring_size.label_tag }}
-                                {{ update_form.ring_size }}
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                {{ update_form.thickness.label_tag }}
-                                {{ update_form.thickness }}
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                {{ update_form.width.label_tag }}
-                                {{ update_form.width }}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ update_form.stone_size.label_tag }}
-                                {{ update_form.stone_size }}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                {{ update_form.desired_weight.label_tag }}
-                                {{ update_form.desired_weight }}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ update_form.material.label_tag }}
-                            {{ update_form.material }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ update_form.comment.label_tag }}
-                            {{ update_form.comment }}
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Бюджет и срок (всегда видны) -->
-                    <h6 class="mb-3">💰 Финансы и сроки</h6>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.budget.label_tag }}
-                            {{ update_form.budget }}
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            {{ update_form.required_by.label_tag }}
-                            {{ update_form.required_by }}
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-lg w-100">💾 Сохранить изменения</button>
-                </form>
-            </div>
-        </div>
     </div>
-</div>
+</section>
 
 <script>
 // Показываем нужные поля при загрузке страницы
@@ -439,5 +443,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endif %}
 {% endblock %}
