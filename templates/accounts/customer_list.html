@@ -1,69 +1,90 @@
 {% extends 'base.html' %}
 {% load phone_filters %}
 
-{% block title %}Список клиентов{% endblock %}
+{% block title %}Список клиентов - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>👥 Список клиентов</h2>
-    <span class="badge bg-primary" style="font-size: 1rem;">Всего: {{ customers|length }}</span>
-</div>
+<section class="customers-section">
+    <div class="container-customers">
+        <!-- HEADER -->
+        <div class="customers-header">
+            <h2 class="customers-title">
+                <i class="bi bi-people"></i>
+                Список клиентов
+            </h2>
+            <span class="customers-count-badge">Всего: {{ customers|length }}</span>
+        </div>
 
-<!-- ФИЛЬТРАЦИЯ -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="GET" class="row g-3">
-            <div class="col-md-10">
-                <input type="text" 
-                       name="search" 
-                       class="form-control" 
-                       placeholder="🔍 Поиск по имени, email, телефону..." 
-                       value="{{ search }}">
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Найти</button>
-            </div>
-        </form>
-    </div>
-</div>
+        <!-- SEARCH CARD -->
+        <div class="customers-search-card">
+            <form method="GET" class="customers-search-form">
+                <div class="search-input-wrapper">
+                    <label for="search">Поиск клиента</label>
+                    <input type="text" 
+                           id="search"
+                           name="search" 
+                           class="search-input" 
+                           placeholder="🔍 Поиск по имени, email, телефону..." 
+                           value="{{ search }}">
+                </div>
+                <button type="submit" class="btn-search">
+                    <i class="bi bi-search"></i>
+                    Найти
+                </button>
+            </form>
+        </div>
 
-<!-- СПИСОК КЛИЕНТОВ -->
-{% if customers %}
-<div class="row">
-    {% for customer in customers %}
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <h5 class="card-title mb-0">
-                        {{ customer.name }} {{ customer.surname }}
-                    </h5>
-                    <span class="badge bg-info">{{ customer.orders_count }} заказ(ов)</span>
+        <!-- CUSTOMER GRID -->
+        {% if customers %}
+        <div class="customers-grid">
+            {% for customer in customers %}
+            <div class="customer-card">
+                <!-- HEADER -->
+                <div class="customer-card-header">
+                    <div class="customer-name-block">
+                        <h5 class="customer-name">
+                            <i class="bi bi-person-circle"></i>
+                            {{ customer.name }} {{ customer.surname }}
+                        </h5>
+                    </div>
+                    <span class="customer-orders-badge">
+                        {{ customer.orders_count }} заказ(ов)
+                    </span>
                 </div>
                 
-                <p class="mb-2">
-                    <i class="bi bi-telephone"></i> 
-                    <strong>Телефон:</strong> {{ customer.phone|format_phone }}
-                </p>
+                <!-- BODY -->
+                <div class="customer-card-body">
+                    <div class="customer-info-item">
+                        <i class="bi bi-telephone"></i>
+                        <span class="customer-info-label">Телефон:</span>
+                        <span class="customer-info-value">{{ customer.phone|format_phone }}</span>
+                    </div>
+                    
+                    <div class="customer-info-item">
+                        <i class="bi bi-envelope"></i>
+                        <span class="customer-info-label">Email:</span>
+                        <span class="customer-info-value">{{ customer.email|default:"—" }}</span>
+                    </div>
+                </div>
                 
-                <p class="mb-3">
-                    <i class="bi bi-envelope"></i> 
-                    <strong>Email:</strong> {{ customer.email|default:"—" }}
-                </p>
-                
-                <a href="{% url 'customer_orders' customer.customer_id %}" 
-                   class="btn btn-primary w-100">
-                    📋 Посмотреть заказы
-                </a>
+                <!-- FOOTER -->
+                <div class="customer-card-footer">
+                    <a href="{% url 'customer_orders' customer.customer_id %}" 
+                       class="btn-view-orders">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Посмотреть заказы
+                    </a>
+                </div>
             </div>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="no-customers">
+            <i class="bi bi-people"></i>
+            <h4>Клиенты не найдены</h4>
+            <p>Попробуйте изменить параметры поиска</p>
+        </div>
+        {% endif %}
     </div>
-    {% endfor %}
-</div>
-{% else %}
-<div class="alert alert-info text-center">
-    <h4>Клиенты не найдены</h4>
-    <p>Попробуйте изменить параметры поиска</p>
-</div>
-{% endif %}
+</section>
 {% endblock %}

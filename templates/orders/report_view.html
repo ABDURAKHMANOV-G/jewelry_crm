@@ -1,136 +1,117 @@
 {% extends 'base.html' %}
 
-{% block title %}Отчёт {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }}{% endblock %}
+{% block title %}Отчёт {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }} - JEWEllUX{% endblock %}
 
 {% block content %}
-<!-- Заголовок -->
-<div class="card mb-4 shadow">
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h2 class="mb-2">📊 Отчёт о работе компании</h2>
-                <p class="mb-1">
-                    <strong>Период:</strong> {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }}
-                </p>
-                <p class="mb-0">
-                    <strong>Дата формирования:</strong> {{ now|date:"d.m.Y H:i" }}
-                </p>
+<section class="report-view-section">
+    <div class="report-view-container">
+        <!-- HEADER CARD -->
+        <div class="report-header-card">
+            <div class="report-header-info">
+                <h1 class="report-header-title">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Отчёт о работе компании
+                </h1>
+                <div class="report-header-meta">
+                    <div class="report-meta-item">
+                        <span class="report-meta-label">Период:</span>
+                        <span class="report-meta-value">{{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="report-meta-item">
+                        <span class="report-meta-label">Дата формирования:</span>
+                        <span class="report-meta-value">{{ now|date:"d.m.Y H:i" }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="{% url 'report_form' %}" class="btn btn-secondary mb-2">
-                    ← Назад
+            <div class="report-header-actions">
+                <a href="{% url 'report_form' %}" class="btn-report-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Назад
                 </a>
-                <a href="{% url 'report_export_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-success mb-2">
-                    <i class="bi bi-download"></i> Скачать PDF
+                <a href="{% url 'report_export_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" 
+                   class="btn-report-download">
+                    <i class="bi bi-download"></i>
+                    Скачать PDF
                 </a>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- ОБЩАЯ СТАТИСТИКА -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card shadow text-center">
-            <div class="card-body">
-                <h5 class="text-muted">Всего заказов</h5>
-                <h2 class="text-primary">{{ report_data.total_orders }}</h2>
+        <!-- STATS GRID -->
+        <div class="report-stats-grid">
+            <div class="report-stat-card">
+                <div class="report-stat-label">Всего заказов</div>
+                <h2 class="report-stat-value stat-primary">{{ report_data.total_orders }}</h2>
+            </div>
+            
+            <div class="report-stat-card">
+                <div class="report-stat-label">Общая выручка</div>
+                <h2 class="report-stat-value stat-success">{{ report_data.total_revenue|floatformat:0 }} ₽</h2>
+            </div>
+            
+            <div class="report-stat-card">
+                <div class="report-stat-label">Средний чек</div>
+                <h2 class="report-stat-value stat-info">{{ report_data.avg_order_value|floatformat:0 }} ₽</h2>
+            </div>
+            
+            <div class="report-stat-card">
+                <div class="report-stat-label">Дней в периоде</div>
+                <h2 class="report-stat-value stat-warning">{% widthratio period_days 1 1 %}</h2>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card shadow text-center">
-            <div class="card-body">
-                <h5 class="text-muted">Общая выручка</h5>
-                <h2 class="text-success">{{ report_data.total_revenue|floatformat:2 }} ₽</h2>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card shadow text-center">
-            <div class="card-body">
-                <h5 class="text-muted">Средний чек</h5>
-                <h2 class="text-info">{{ report_data.avg_order_value|floatformat:2 }} ₽</h2>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card shadow text-center">
-            <div class="card-body">
-                <h5 class="text-muted">Дней в периоде</h5>
-                <h2 class="text-warning">
-                    {% widthratio period_days 1 1 %}
-                </h2>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- ЗАКАЗЫ ПО СТАТУСАМ -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">📋 Заказы по статусам</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
+        <!-- TWO COLUMN LAYOUT -->
+        <div class="report-two-columns">
+            <!-- STATUS STATS -->
+            <div class="report-data-card">
+                <div class="report-data-header">
+                    <h3 class="report-data-title">
+                        <i class="bi bi-list-check"></i>
+                        Заказы по статусам
+                    </h3>
+                </div>
+                <div class="report-data-body">
+                    <table class="report-simple-table">
                         <tbody>
                             {% for item in report_data.status_stats %}
                             <tr>
                                 <td>
-                                    {% if item.order_status == 'new' %}
-                                        🆕 Новый
-                                    {% elif item.order_status == 'confirmed' %}
-                                        ✅ Подтвержден
-                                    {% elif item.order_status == 'in_work' %}
-                                        ⚙️ В работе
-                                    {% elif item.order_status == 'ready' %}
-                                        ✔️ Готов
-                                    {% elif item.order_status == 'delivered' %}
-                                        📦 Доставлен
+                                    {% if item.order_status == 'new' %}🆕 Новый
+                                    {% elif item.order_status == 'confirmed' %}✅ Подтвержден
+                                    {% elif item.order_status == 'in_work' %}⚙️ В работе
+                                    {% elif item.order_status == 'ready' %}✔️ Готов
+                                    {% elif item.order_status == 'delivered' %}📦 Доставлен
                                     {% endif %}
                                 </td>
-                                <td class="text-end"><strong>{{ item.count }}</strong></td>
+                                <td>{{ item.count }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- ТИПЫ ИЗДЕЛИЙ -->
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">💍 Типы изделий</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
+            
+            <!-- PRODUCT STATS -->
+            <div class="report-data-card">
+                <div class="report-data-header">
+                    <h3 class="report-data-title">
+                        <i class="bi bi-gem"></i>
+                        Типы изделий
+                    </h3>
+                </div>
+                <div class="report-data-body">
+                    <table class="report-simple-table">
                         <tbody>
                             {% for item in report_data.product_stats %}
                             <tr>
                                 <td>
-                                    {% if item.product_type == 'ring' %}
-                                        💍 Кольца
-                                    {% elif item.product_type == 'brooch' %}
-                                        🌸 Броши
-                                    {% elif item.product_type == 'bracelet' %}
-                                        📿 Браслеты
-                                    {% elif item.product_type == 'earrings' %}
-                                        💎 Серьги
-                                    {% else %}
-                                        ❓ Не указано
+                                    {% if item.product_type == 'ring' %}💍 Кольца
+                                    {% elif item.product_type == 'brooch' %}🌸 Броши
+                                    {% elif item.product_type == 'bracelet' %}📿 Браслеты
+                                    {% elif item.product_type == 'earrings' %}💎 Серьги
+                                    {% else %}❓ Не указано
                                     {% endif %}
                                 </td>
-                                <td class="text-end"><strong>{{ item.count }}</strong></td>
+                                <td>{{ item.count }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -138,90 +119,93 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- ТОП КЛИЕНТОВ -->
-<div class="card shadow mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">👥 ТОП-5 Клиентов</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Клиент</th>
-                        <th class="text-center">Заказов</th>
-                        <th class="text-end">Сумма</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for customer in report_data.top_customers %}
-                    <tr>
-                        <td><strong>{{ customer.customer__name }} {{ customer.customer__surname }}</strong></td>
-                        <td class="text-center">
-                            <span class="badge bg-info">{{ customer.count }}</span>
-                        </td>
-                        <td class="text-end">{{ customer.total_spent|default:0|floatformat:2 }} ₽</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- TOP CUSTOMERS -->
+        <div class="report-full-card">
+            <div class="report-data-header">
+                <h3 class="report-data-title">
+                    <i class="bi bi-star"></i>
+                    ТОП-5 Клиентов
+                </h3>
+            </div>
+            <div class="report-data-body">
+                <table class="report-detailed-table">
+                    <thead>
+                        <tr>
+                            <th>Клиент</th>
+                            <th class="text-center">Заказов</th>
+                            <th class="text-end">Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in report_data.top_customers %}
+                        <tr>
+                            <td>{{ customer.customer__name }} {{ customer.customer__surname }}</td>
+                            <td class="text-center">
+                                <span class="report-customer-badge">{{ customer.count }}</span>
+                            </td>
+                            <td class="text-end">
+                                <span class="report-amount">{{ customer.total_spent|default:0|floatformat:2 }} ₽</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-</div>
 
-<!-- СПИСОК ВСЕХ ЗАКАЗОВ -->
-<div class="card shadow">
-    <div class="card-header bg-secondary text-white">
-        <h5 class="mb-0">📜 Все заказы за период ({{ orders.count }})</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-sm table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>№ Заказа</th>
-                        <th>Клиент</th>
-                        <th>Тип</th>
-                        <th>Статус</th>
-                        <th class="text-end">Сумма</th>
-                        <th>Дата</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr>
-                        <td><strong>#{{ order.order_id }}</strong></td>
-                        <td>{{ order.customer.name }} {{ order.customer.surname }}</td>
-                        <td>
-                            {% if order.product_type == 'ring' %}💍
-                            {% elif order.product_type == 'brooch' %}🌸
-                            {% elif order.product_type == 'bracelet' %}📿
-                            {% elif order.product_type == 'earrings' %}💎
-                            {% endif %}
-                            {{ order.get_product_type_display|default:"—" }}
-                        </td>
-                        <td>
-                            <span class="badge 
-                                {% if order.order_status == 'new' %}bg-primary
-                                {% elif order.order_status == 'confirmed' %}bg-info
-                                {% elif order.order_status == 'in_work' %}bg-warning
-                                {% elif order.order_status == 'ready' %}bg-success
-                                {% elif order.order_status == 'delivered' %}bg-secondary
+        <!-- ALL ORDERS -->
+        <div class="report-full-card">
+            <div class="report-data-header">
+                <h3 class="report-data-title">
+                    <i class="bi bi-list-ul"></i>
+                    Все заказы за период ({{ orders.count }})
+                </h3>
+            </div>
+            <div class="report-data-body">
+                <table class="report-detailed-table">
+                    <thead>
+                        <tr>
+                            <th>№ Заказа</th>
+                            <th>Клиент</th>
+                            <th>Тип</th>
+                            <th>Статус</th>
+                            <th class="text-end">Сумма</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>
+                                <span class="report-order-number">#{{ order.order_id }}</span>
+                            </td>
+                            <td>{{ order.customer.name }} {{ order.customer.surname }}</td>
+                            <td>
+                                {% if order.product_type == 'ring' %}💍 Кольцо
+                                {% elif order.product_type == 'brooch' %}🌸 Брошь
+                                {% elif order.product_type == 'bracelet' %}📿 Браслет
+                                {% elif order.product_type == 'earrings' %}💎 Серьги
+                                {% else %}—
                                 {% endif %}
-                            ">
-                                {{ order.get_status_display_ru }}
-                            </span>
-                        </td>
-                        <td class="text-end">{{ order.budget|default:"—" }} ₽</td>
-                        <td>{{ order.created_at|date:"d.m.Y" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <span class="report-status-badge status-{{ order.order_status }}">
+                                    {{ order.get_status_display_ru }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <span class="report-amount">{{ order.budget|default:"—" }} ₽</span>
+                            </td>
+                            <td>
+                                <span class="report-date">{{ order.created_at|date:"d.m.Y" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
