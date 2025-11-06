@@ -1,63 +1,258 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Создать документ{% endblock %}
+{% block title %}Создать документ - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">📄 Создать документ для заказа #{{ order.order_id }}</h4>
+<section class="document-create-section">
+    <div class="document-create-container">
+        <!-- HEADER -->
+        <div class="document-create-header">
+            <div class="doc-header-icon">
+                <i class="bi bi-file-earmark-plus"></i>
             </div>
-            <div class="card-body">
-                <!-- Информация о заказе -->
-                <div class="alert alert-info mb-4">
-                    <strong>Заказ:</strong> #{{ order.order_id }}<br>
-                    <strong>Клиент:</strong> {{ order.customer.name }} {{ order.customer.surname }}<br>
-                    <strong>Бюджет:</strong> {{ order.budget|default:"—" }} ₽
-                </div>
-                
-                <form method="POST">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        {{ form.document_type.label_tag }}
-                        {{ form.document_type }}
-                        <small class="form-text text-muted">Выберите тип создаваемого документа</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.document_number.label_tag }}
-                        {{ form.document_number }}
-                        <small class="form-text text-muted">Оставьте пустым для автоматической генерации</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.document_date.label_tag }}
-                        {{ form.document_date }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.amount.label_tag }}
-                        {{ form.amount }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.description.label_tag }}
-                        {{ form.description }}
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle"></i> Создать документ
-                        </button>
-                        <a href="{% url 'document_list' order.order_id %}" class="btn btn-secondary">
-                            Отмена
-                        </a>
-                    </div>
-                </form>
+            <div class="doc-header-text">
+                <h1 class="doc-header-title">Создать документ</h1>
+                <p class="doc-header-subtitle">Заказ #{{ order.order_id }}</p>
             </div>
         </div>
+
+        <!-- ORDER INFO CARD -->
+        <div class="doc-order-info-card">
+            <div class="doc-info-icon">
+                <i class="bi bi-info-circle"></i>
+            </div>
+            <div class="doc-info-content">
+                <div class="doc-info-row">
+                    <span class="doc-info-label">Заказ:</span>
+                    <span class="doc-info-value">#{{ order.order_id }}</span>
+                </div>
+                <div class="doc-info-row">
+                    <span class="doc-info-label">Клиент:</span>
+                    <span class="doc-info-value">{{ order.customer.name }} {{ order.customer.surname }}</span>
+                </div>
+                <div class="doc-info-row">
+                    <span class="doc-info-label">Бюджет:</span>
+                    <span class="doc-info-value">{{ order.budget|default:"—" }} ₽</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="doc-form-card">
+            <form method="POST" id="documentForm" novalidate>
+                {% csrf_token %}
+                
+                <!-- Document Type -->
+                <div class="doc-form-group">
+                    <label for="id_document_type" class="doc-form-label">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Тип документа *
+                    </label>
+                    {{ form.document_type }}
+                    <small class="doc-form-hint">Выберите тип создаваемого документа</small>
+                    <div class="doc-error-message" id="error_document_type"></div>
+                </div>
+                
+                <!-- Document Number -->
+                <div class="doc-form-group">
+                    <label for="id_document_number" class="doc-form-label">
+                        <i class="bi bi-hash"></i>
+                        Номер документа
+                    </label>
+                    {{ form.document_number }}
+                    <small class="doc-form-hint">Оставьте пустым для автоматической генерации</small>
+                    <div class="doc-error-message" id="error_document_number"></div>
+                </div>
+                
+                <!-- Document Date -->
+                <div class="doc-form-group">
+                    <label for="id_document_date" class="doc-form-label">
+                        <i class="bi bi-calendar-event"></i>
+                        Дата документа *
+                    </label>
+                    {{ form.document_date }}
+                    <div class="doc-error-message" id="error_document_date"></div>
+                </div>
+                
+                <!-- Amount -->
+                <div class="doc-form-group">
+                    <label for="id_amount" class="doc-form-label">
+                        <i class="bi bi-currency-dollar"></i>
+                        Сумма (₽) *
+                    </label>
+                    {{ form.amount }}
+                    <div class="doc-error-message" id="error_amount"></div>
+                </div>
+                
+                <!-- Description -->
+                <div class="doc-form-group">
+                    <label for="id_description" class="doc-form-label">
+                        <i class="bi bi-text-left"></i>
+                        Описание
+                    </label>
+                    {{ form.description }}
+                    <small class="doc-form-hint">Дополнительная информация о документе</small>
+                    <div class="doc-error-message" id="error_description"></div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="doc-form-actions">
+                    <button type="submit" class="btn-doc-submit">
+                        <i class="bi bi-check-circle"></i>
+                        Создать документ
+                    </button>
+                    <a href="{% url 'document_list' order.order_id %}" class="btn-doc-cancel">
+                        <i class="bi bi-x-circle"></i>
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</section>
+
+<script>
+// ========================================
+// DOCUMENT CREATE FORM VALIDATION
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('documentForm');
+    
+    // Поля формы
+    const documentType = document.getElementById('id_document_type');
+    const documentDate = document.getElementById('id_document_date');
+    const amount = document.getElementById('id_amount');
+    
+    // Установка сегодняшней даты по умолчанию
+    if (documentDate && !documentDate.value) {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        documentDate.value = formattedDate;
+    }
+    
+    // Валидация при отправке формы
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Очистка предыдущих ошибок
+        clearErrors();
+        
+        // Валидация типа документа
+        if (!documentType.value || documentType.value === '') {
+            showError('document_type', 'Пожалуйста, выберите тип документа');
+            isValid = false;
+        }
+        
+        // Валидация даты документа
+        if (!documentDate.value || documentDate.value === '') {
+            showError('document_date', 'Пожалуйста, укажите дату документа');
+            isValid = false;
+        }
+        
+        // Валидация суммы
+        if (!amount.value || amount.value === '' || parseFloat(amount.value) <= 0) {
+            showError('amount', 'Пожалуйста, укажите сумму больше 0');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Прокрутка к первой ошибке
+            const firstError = document.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+    
+    // Удаление ошибки при изменении поля
+    const allFields = [documentType, documentDate, amount];
+    allFields.forEach(field => {
+        if (field) {
+            field.addEventListener('input', function() {
+                clearFieldError(field.id.replace('id_', ''));
+            });
+            
+            field.addEventListener('change', function() {
+                clearFieldError(field.id.replace('id_', ''));
+            });
+        }
+    });
+    
+    function showError(fieldName, message) {
+        const field = document.getElementById('id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        
+        if (field) {
+            field.classList.add('error');
+        }
+        
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+    }
+    
+    function clearFieldError(fieldName) {
+        const field = document.getElementById('id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        
+        if (field) {
+            field.classList.remove('error');
+        }
+        
+        if (errorDiv) {
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+        }
+    }
+    
+    function clearErrors() {
+        const errorDivs = document.querySelectorAll('.doc-error-message');
+        const errorFields = document.querySelectorAll('.error');
+        
+        errorDivs.forEach(div => {
+            div.textContent = '';
+            div.classList.remove('show');
+        });
+        
+        errorFields.forEach(field => {
+            field.classList.remove('error');
+        });
+    }
+});
+// Ограничение на ввод только цифр в номер документа
+document.addEventListener('DOMContentLoaded', function() {
+    const documentNumber = document.getElementById('id_document_number');
+    
+    if (documentNumber) {
+        // Запрещаем ввод не-цифр
+        documentNumber.addEventListener('input', function(e) {
+            // Удаляем все символы кроме цифр
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        
+        // Запрещаем вставку не-цифр через Ctrl+V
+        documentNumber.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numbersOnly = pastedText.replace(/[^0-9]/g, '');
+            this.value = numbersOnly;
+        });
+        
+        // Запрещаем ввод с клавиатуры не-цифр
+        documentNumber.addEventListener('keypress', function(e) {
+            // Разрешаем только цифры (коды 48-57) и служебные клавиши
+            const charCode = e.which || e.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+
+</script>
 {% endblock %}

@@ -1,51 +1,190 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Редактировать документ{% endblock %}
+{% block title %}Редактировать документ - JEWEllUX{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-warning">
-                <h4 class="mb-0">✏️ Редактировать документ</h4>
+<section class="document-update-section">
+    <div class="document-update-container">
+        <!-- HEADER -->
+        <div class="document-update-header">
+            <div class="doc-update-header-icon">
+                <i class="bi bi-pencil-square"></i>
             </div>
-            <div class="card-body">
-                <!-- Информация о документе -->
-                <div class="alert alert-secondary mb-4">
-                    <strong>Тип:</strong> {{ document.get_document_type_display_icon }} {{ document.get_document_type_display }}<br>
-                    <strong>Номер:</strong> {{ document.document_number }}<br>
-                    <strong>Заказ:</strong> #{{ document.order.order_id }}
-                </div>
-                
-                <form method="POST">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        {{ form.document_date.label_tag }}
-                        {{ form.document_date }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.amount.label_tag }}
-                        {{ form.amount }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.description.label_tag }}
-                        {{ form.description }}
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save"></i> Сохранить изменения
-                        </button>
-                        <a href="{% url 'document_list' document.order.order_id %}" class="btn btn-secondary">
-                            Отмена
-                        </a>
-                    </div>
-                </form>
+            <div class="doc-update-header-text">
+                <h1 class="doc-update-header-title">Редактировать документ</h1>
+                <p class="doc-update-header-subtitle">Документ {{ document.document_number }}</p>
             </div>
         </div>
+
+        <!-- DOCUMENT INFO CARD -->
+        <div class="doc-update-info-card">
+            <div class="doc-update-info-content">
+                <div class="doc-update-info-row">
+                    <span class="doc-update-info-label">Тип:</span>
+                    <span class="doc-update-info-value">
+                        {{ document.get_document_type_display_icon }} {{ document.get_document_type_display }}
+                    </span>
+                </div>
+                <div class="doc-update-info-row">
+                    <span class="doc-update-info-label">Номер:</span>
+                    <span class="doc-update-info-value">{{ document.document_number }}</span>
+                </div>
+                <div class="doc-update-info-row">
+                    <span class="doc-update-info-label">Заказ:</span>
+                    <span class="doc-update-info-value">#{{ document.order.order_id }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="doc-update-form-card">
+            <form method="POST" id="documentUpdateForm" novalidate>
+                {% csrf_token %}
+                
+                <!-- Document Date -->
+                <div class="doc-update-form-group">
+                    <label for="id_document_date" class="doc-update-form-label">
+                        <i class="bi bi-calendar-event"></i>
+                        Дата документа *
+                    </label>
+                    {{ form.document_date }}
+                    <div class="doc-update-error-message" id="error_document_date"></div>
+                </div>
+                
+                <!-- Amount -->
+                <div class="doc-update-form-group">
+                    <label for="id_amount" class="doc-update-form-label">
+                        <i class="bi bi-currency-dollar"></i>
+                        Сумма (₽) *
+                    </label>
+                    {{ form.amount }}
+                    <div class="doc-update-error-message" id="error_amount"></div>
+                </div>
+                
+                <!-- Description -->
+                <div class="doc-update-form-group">
+                    <label for="id_description" class="doc-update-form-label">
+                        <i class="bi bi-text-left"></i>
+                        Описание
+                    </label>
+                    {{ form.description }}
+                    <div class="doc-update-error-message" id="error_description"></div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="doc-update-form-actions">
+                    <button type="submit" class="btn-doc-update-submit">
+                        <i class="bi bi-save"></i>
+                        Сохранить изменения
+                    </button>
+                    <a href="{% url 'document_list' document.order.order_id %}" class="btn-doc-update-cancel">
+                        <i class="bi bi-x-circle"></i>
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</section>
+
+<script>
+// ========================================
+// DOCUMENT UPDATE FORM VALIDATION
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('documentUpdateForm');
+    
+    // Поля формы
+    const documentDate = document.getElementById('id_document_date');
+    const amount = document.getElementById('id_amount');
+    
+    // Валидация при отправке формы
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Очистка предыдущих ошибок
+        clearErrors();
+        
+        // Валидация даты документа
+        if (!documentDate.value || documentDate.value === '') {
+            showError('document_date', 'Пожалуйста, укажите дату документа');
+            isValid = false;
+        }
+        
+        // Валидация суммы
+        if (!amount.value || amount.value === '' || parseFloat(amount.value) <= 0) {
+            showError('amount', 'Пожалуйста, укажите сумму больше 0');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Прокрутка к первой ошибке
+            const firstError = document.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+    
+    // Удаление ошибки при изменении поля
+    const allFields = [documentDate, amount];
+    allFields.forEach(field => {
+        if (field) {
+            field.addEventListener('input', function() {
+                clearFieldError(field.id.replace('id_', ''));
+            });
+            
+            field.addEventListener('change', function() {
+                clearFieldError(field.id.replace('id_', ''));
+            });
+        }
+    });
+    
+    function showError(fieldName, message) {
+        const field = document.getElementById('id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        
+        if (field) {
+            field.classList.add('error');
+        }
+        
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+    }
+    
+    function clearFieldError(fieldName) {
+        const field = document.getElementById('id_' + fieldName);
+        const errorDiv = document.getElementById('error_' + fieldName);
+        
+        if (field) {
+            field.classList.remove('error');
+        }
+        
+        if (errorDiv) {
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+        }
+    }
+    
+    function clearErrors() {
+        const errorDivs = document.querySelectorAll('.doc-update-error-message');
+        const errorFields = document.querySelectorAll('.error');
+        
+        errorDivs.forEach(div => {
+            div.textContent = '';
+            div.classList.remove('show');
+        });
+        
+        errorFields.forEach(field => {
+            field.classList.remove('error');
+        });
+    }
+});
+</script>
 {% endblock %}

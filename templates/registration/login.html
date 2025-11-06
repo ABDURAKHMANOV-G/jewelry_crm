@@ -18,7 +18,7 @@
 
         <!-- CARD -->
         <div class="auth-card">
-            <form method="POST" action="{% url 'login' %}" class="auth-form" novalidate>
+            <form method="POST" action="{% url 'login' %}" class="auth-form" autocomplete="on" novalidate>
                 {% csrf_token %}
                 
                 <!-- Сообщения -->
@@ -39,7 +39,13 @@
                         <i class="bi bi-person"></i>
                         Имя пользователя
                     </label>
-                    <input type="text" name="username" id="username" class="auth-input" autofocus placeholder="Введите имя пользователя">
+                    <input type="text" 
+                           name="username" 
+                           id="username" 
+                           class="auth-input" 
+                           autocomplete="username"
+                           autofocus 
+                           placeholder="Введите имя пользователя">
                 </div>
                 
                 <!-- Пароль -->
@@ -48,7 +54,12 @@
                         <i class="bi bi-lock"></i>
                         Пароль
                     </label>
-                    <input type="password" name="password" id="password" class="auth-input" placeholder="Введите пароль">
+                    <input type="password" 
+                           name="password" 
+                           id="password" 
+                           class="auth-input" 
+                           autocomplete="current-password"
+                           placeholder="Введите пароль">
                 </div>
                 
                 <!-- Кнопка входа -->

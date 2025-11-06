@@ -61,6 +61,23 @@ class Order(models.Model):
     material = models.CharField(max_length=50, null=True, blank=True, verbose_name='Материал')
     
     budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    # Ценообразование
+    estimated_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        verbose_name='Предполагаемая цена (для индивидуального)'
+    )
+    final_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        verbose_name='Окончательная цена'
+    )
+    template_coefficient = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        verbose_name='Коэффициент шаблона'
+    )
+    price_confirmed = models.BooleanField(
+        default=False,
+        verbose_name='Цена подтверждена менеджером'
+    )
     required_by = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True, verbose_name='Комментарий/Уточнения')
     created_at = models.DateTimeField(auto_now_add=True)
