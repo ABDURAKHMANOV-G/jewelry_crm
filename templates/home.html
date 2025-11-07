@@ -12,10 +12,15 @@
             <h1>Создай свое уникальное изделие в один клик</h1>
             <p>Наша система позволяет с легкостью сформулировать задание для ювелира и превратить ваши самые смелые идеи в реальность</p>
             {% if user.is_authenticated %}
-                <a href="{% url 'order_create' %}" class="btn-gold btn-lg">Сделать заказ</a>
+                {% if user.role == 'client' %}
+                    <a href="{% url 'order_create' %}" class="btn-gold btn-lg">Сделать заказ</a>
+                {% else %}
+                    <a href="{% url 'order_list' %}" class="btn-gold btn-lg">Мои заказы</a>
+                {% endif %}
             {% else %}
                 <a href="{% url 'register' %}" class="btn-gold btn-lg">Начать создание</a>
             {% endif %}
+
         </div>
 
         <!-- Карусель примеров работ -->

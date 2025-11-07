@@ -246,6 +246,19 @@
                         Финансы и сроки
                     </h2>
                     
+                    <div class="form-group">
+                        <label for="proposed_price" class="form-label">
+                            <i class="bi bi-calculator"></i>
+                            Предложенная цена (автоматический расчет)
+                        </label>
+                        <div class="proposed-price-container" id="proposed_price">
+                            <span class="proposed-price-value" id="proposed_price_value">0 ₽</span>
+                            <small class="form-hint">
+                                Рассчитывается на основе материала, типа изделия и коэффициентов
+                            </small>
+                        </div>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="id_budget">Бюджет (₽) *</label>
@@ -281,6 +294,120 @@
 </section>
 
 <script>
+
+    // ========================================
+// PRICING CONFIG - ВСТРОИТЬ В НАЧАЛО
+// ========================================
+const PRICING_CONFIG = {
+    materials: {
+        'gold_585': { name: 'Золото 585', pricePerGram: 3500, density: 15.8 },
+        'gold_750': { name: 'Золото 750', pricePerGram: 4200, density: 17.3 },
+        'silver_925': { name: 'Серебро 925', pricePerGram: 45, density: 10.5 },
+        'platinum': { name: 'Платина', pricePerGram: 8500, density: 21.45 }
+    },
+    templateCoefficients: {
+        'ring': {
+            'ring1': { name: 'Классика', coefficient: 1.5 },
+            'ring2': { name: 'Винтаж', coefficient: 1.8 },
+            'ring3': { name: 'Романтик', coefficient: 1.6 }
+        },
+        'brooch': {
+            'brooch1': { name: 'Цветок', coefficient: 2.2 },
+            'brooch2': { name: 'Бабочка', coefficient: 2.0 }
+        },
+        'bracelet': {
+            'bracelet1': { name: 'Элегант', coefficient: 1.9 },
+            'bracelet2': { name: 'Модерн', coefficient: 2.1 }
+        },
+        'earrings': {
+            'earring1': { name: 'Капли', coefficient: 1.4 },
+            'earring2': { name: 'Премиум', coefficient: 1.7 }
+        }
+    },
+    productComplexity: {
+        'ring': 1.0,
+        'brooch': 1.3,
+        'bracelet': 1.1,
+        'earrings': 0.9
+    },
+    laborCost: 0.35
+};
+
+function getMaterialPrice(materialType) {
+    return PRICING_CONFIG.materials[materialType]?.pricePerGram || 0;
+}
+
+function getTemplateCoefficient(productType, templateId) {
+    return PRICING_CONFIG.templateCoefficients[productType]?.[templateId]?.coefficient || 1.0;
+}
+
+function getComplexityCoefficient(productType) {
+    return PRICING_CONFIG.productComplexity[productType] || 1.0;
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('ru-RU', {
+        style: 'currency',
+        currency: 'RUB',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    }).format(price);
+}
+
+function calculateTemplatePrice(weight, materialType, templateId, productType) {
+    if (!weight || weight <= 0) return 0;
+    const coefficient = getTemplateCoefficient(productType, templateId);
+    const materialPrice = getMaterialPrice(materialType);
+    const complexityCoeff = getComplexityCoefficient(productType);
+    const baseMaterialCost = weight * materialPrice;
+    const materialWithCoeff = baseMaterialCost * coefficient * complexityCoeff;
+    const totalCost = materialWithCoeff * (1 + PRICING_CONFIG.laborCost);
+    return Math.round(totalCost * 100) / 100;
+}
+
+function calculateCustomPrice(weight, materialType, productType) {
+    if (!weight || weight <= 0) return 0;
+    const materialPrice = getMaterialPrice(materialType);
+    const complexityCoeff = getComplexityCoefficient(productType);
+    const baseMaterialCost = weight * materialPrice * complexityCoeff;
+    const totalCost = baseMaterialCost * (1 + PRICING_CONFIG.laborCost);
+    return Math.round(totalCost * 100) / 100;
+}
+
+function updateProposedPrice() {
+    const orderType = document.getElementById('id_order_type').value;
+    const material = document.getElementById('id_material').value;
+    let proposedPrice = 0;
+    
+    if (orderType === 'template') {
+        const templateId = document.getElementById('id_template_image').value;
+        const productType = document.getElementById('id_product_type').value;
+        const ringSize = document.getElementById('id_ring_size')?.value;
+        
+        let weight = 3;
+        if (productType === 'ring' && ringSize) {
+            weight = Math.max(2, ringSize * 0.4);
+        } else if (productType === 'brooch') {
+            weight = 8;
+        } else if (productType === 'bracelet') {
+            weight = 12;
+        } else if (productType === 'earrings') {
+            weight = 2;
+        }
+        
+        proposedPrice = calculateTemplatePrice(weight, material, templateId, productType);
+    } else if (orderType === 'custom') {
+        const productType = document.getElementById('id_product_type').value;
+        const desiredWeight = parseFloat(document.getElementById('id_desired_weight')?.value) || 0;
+        proposedPrice = calculateCustomPrice(desiredWeight, material, productType);
+    }
+    
+    const priceField = document.getElementById('proposed_price_value');
+    if (priceField) {
+        priceField.textContent = formatPrice(proposedPrice);
+        priceField.dataset.value = proposedPrice;
+    }
+}
 // ========================================
 // TOGGLE ORDER TYPE (Template/Custom)
 // ========================================
@@ -294,10 +421,24 @@ function toggleOrderType() {
     if (templateSection) templateSection.style.display = 'none';
     if (customSection) customSection.style.display = 'none';
     
+    // Получаем поля
+    const templateRingSize = document.getElementById('id_ring_size');
+    const customRingSize = document.getElementById('id_custom_size');
+
     if (orderType === 'template') {
         if (templateSection) templateSection.style.display = 'block';
         initTemplateCarousel();
         
+         // ✅ ВКЛЮЧАЕМ поле шаблонного размера
+        if (templateRingSize) {
+            templateRingSize.disabled = false;
+        }
+        // ❌ ОТКЛЮЧАЕМ поле индивидуального размера
+        if (customRingSize) {
+            customRingSize.disabled = true;
+            customRingSize.value = ''; // Очищаем значение
+        }
+
         if (productType === 'ring' && templateRingSizeGroup) {
             templateRingSizeGroup.style.display = 'block';
         } else if (templateRingSizeGroup) {
@@ -305,6 +446,19 @@ function toggleOrderType() {
         }
     } else if (orderType === 'custom') {
         if (customSection) customSection.style.display = 'block';
+         // ❌ ОТКЛЮЧАЕМ поле шаблонного размера
+        if (templateRingSize) {
+            templateRingSize.disabled = true;
+            templateRingSize.value = ''; // Очищаем значение
+        }
+        // ✅ ВКЛЮЧАЕМ поле индивидуального размера
+        if (customRingSize) {
+            customRingSize.disabled = false;
+        }
+    } else {
+        // Если тип заказа не выбран, отключаем оба поля
+        if (templateRingSize) templateRingSize.disabled = true;
+        if (customRingSize) customRingSize.disabled = true;
     }
 }
 
@@ -705,6 +859,25 @@ document.addEventListener('DOMContentLoaded', function() {
             clearError(this);
         });
     });
+// ДОБАВИТЬ эти поля для отслеживания изменения цены
+    const priceFields = [
+        'id_order_type',
+        'id_product_type',
+        'id_material',
+        'id_template_image',
+        'id_ring_size',
+        'id_desired_weight'
+    ];
+    
+    priceFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('change', updateProposedPrice);
+            field.addEventListener('input', updateProposedPrice);
+        }
+    });
+    
+    setTimeout(updateProposedPrice, 500);
 });
 </script>
 

@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -15,6 +16,77 @@ from .reports import generate_report_data, generate_report_pdf
 from datetime import datetime, timedelta
 
 
+# ========================================
+# ФУНКЦИЯ РАСЧЕТА ЦЕНЫ ЗАКАЗА
+# ========================================
+def calculate_order_price(order):
+    """
+    Рассчитывает estimated_price для заказа
+    на основе материала, типа и параметров
+    """
+    PRICING_CONFIG = {
+        'materials': {
+            'gold_585': 3500,
+            'gold_750': 4200,
+            'silver_925': 45,
+            'platinum': 8500
+        },
+        'product_complexity': {
+            'ring': 1.0,
+            'brooch': 1.3,
+            'bracelet': 1.1,
+            'earrings': 0.9
+        },
+        'labor_cost': 0.35
+    }
+
+    # Проверка наличия необходимых данных
+    if not order.material or not order.product_type:
+        return None
+
+    material_price = PRICING_CONFIG['materials'].get(order.material)
+    if not material_price:
+        return None
+
+    complexity = PRICING_CONFIG['product_complexity'].get(order.product_type, 1.0)
+
+    try:
+        if order.order_type == 'template':
+            # Расчет для шаблонного заказа
+            if order.product_type == 'ring':
+                # Примерный вес по размеру кольца
+                ring_size = float(order.ring_size or 17)
+                weight = max(2, ring_size * 0.4)
+            elif order.product_type == 'brooch':
+                weight = 8
+            elif order.product_type == 'bracelet':
+                weight = 12
+            elif order.product_type == 'earrings':
+                weight = 2
+            else:
+                weight = 3
+
+            # Коэффициент шаблона (упрощенно)
+            coefficient = 1.5
+            base_cost = weight * material_price * coefficient
+
+        elif order.order_type == 'custom':
+            # Расчет для индивидуального заказа
+            weight = float(order.desired_weight or 5)
+            if weight <= 0:
+                return None
+            base_cost = weight * material_price
+        else:
+            return None
+
+        # Применяем коэффициент сложности и трудозатраты (35%)
+        final_price = base_cost * complexity * (1 + PRICING_CONFIG['labor_cost'])
+        return round(final_price, 2)
+
+    except (ValueError, TypeError):
+        return None
+
+
 @login_required
 def order_list(request):
     """Список заказов (доступно всем авторизованным)"""
@@ -28,7 +100,7 @@ def order_list(request):
         orders = Order.objects.all().order_by('-order_id')
     else:  # modeler, jeweler
         orders = Order.objects.filter(user=request.user).order_by('-order_id')
-    
+
     return render(request, 'orders/order_list.html', {'orders': orders})
 
 
@@ -39,7 +111,7 @@ def order_create(request):
     if not customer:
         messages.error(request, 'Профиль клиента не найден. Обратитесь к администратору.')
         return redirect('home')
-    
+
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
@@ -48,15 +120,21 @@ def order_create(request):
                     order = form.save(commit=False)
                     order.customer = customer
                     order.order_status = 'new'
+
+                    # 🔴 РАССЧИТЫВАЕМ И СОХРАНЯЕМ ЦЕНУ
+                    estimated_price = calculate_order_price(order)
+                    if estimated_price:
+                        order.estimated_price = estimated_price
+
                     order.save()
-                    
+
                     messages.success(request, f'Заказ #{order.order_id} успешно создан!')
                     return redirect('order_detail', pk=order.order_id)
             except Exception as e:
                 messages.error(request, f'Ошибка при создании заказа: {str(e)}')
     else:
         form = OrderCreateForm()
-    
+
     return render(request, 'orders/order_create.html', {'form': form})
 
 
@@ -64,36 +142,56 @@ def order_create(request):
 def order_detail(request, pk):
     """Детали заказа - с проверкой прав доступа"""
     order = get_object_or_404(Order, pk=pk)
-    
+
     # ПРОВЕРКА ПРАВ ДОСТУПА
     if request.user.role == 'client':
         # Клиент видит только свои заказы
         if not order.customer or order.customer.user != request.user:
             messages.error(request, 'У вас нет доступа к этому заказу.')
             return redirect('order_list')
-    
+
     elif request.user.role in ['modeler', 'jeweler']:
         # Модельер/Ювелир видит только назначенные ему заказы
         if order.user != request.user:
             messages.error(request, 'Этот заказ не назначен вам.')
             return redirect('order_list')
-    
+
     # Менеджер видит все заказы
-    
+
     # Форма редактирования ТОЛЬКО ДЛЯ МЕНЕДЖЕРА
     update_form = None
     if request.user.role == 'manager':
         if request.method == 'POST':
             update_form = OrderUpdateForm(request.POST, instance=order)
             if update_form.is_valid():
-                update_form.save()
+                order = update_form.save(commit=False)
+                
+                # ✅ ЯВНО СОХРАНЯЕМ ВСЕ ПАРАМЕТРЫ ИЗ ФОРМЫ
+                order.ring_size = update_form.cleaned_data.get('ring_size')
+                order.thickness = update_form.cleaned_data.get('thickness')
+                order.width = update_form.cleaned_data.get('width')
+                order.stone_size = update_form.cleaned_data.get('stone_size')
+                order.desired_weight = update_form.cleaned_data.get('desired_weight')
+                
+                # 🔴 ПЕРЕСЧИТЫВАЕМ ЦЕНУ ПРИ ОБНОВЛЕНИИ
+                estimated_price = calculate_order_price(order)
+                if estimated_price:
+                    order.estimated_price = estimated_price
+                # 🔴 НОВОЕ: ПРОВЕРЯЕМ БЫЛА ЛИ ЦЕНА УСТАНОВЛЕНА
+                if order.final_price and order.final_price > 0:
+                    order.price_confirmed = True
+                    messages.success(
+                        request,
+                        f'✅ Цена установлена: {order.final_price:.0f} ₽'
+                    )
+                order.save()
                 messages.success(request, 'Заказ обновлен!')
                 return redirect('order_detail', pk=pk)
         else:
             update_form = OrderUpdateForm(instance=order)
-    
+
     order_products = order.order_products.all()
-    
+
     return render(request, 'orders/order_detail.html', {
         'order': order,
         'order_products': order_products,
@@ -105,33 +203,33 @@ def order_detail(request, pk):
 def order_delete(request, pk):
     """Удаление заказа - клиент или менеджер"""
     order = get_object_or_404(Order, pk=pk)
-    
+
     # ПРОВЕРКА ПРАВ
     if request.user.role == 'client':
         # Клиент может удалять ТОЛЬКО свои новые заказы
         if not order.customer or order.customer.user != request.user:
             messages.error(request, 'У вас нет прав на удаление этого заказа.')
             return redirect('order_list')
-        
+
         if order.order_status != 'new':
             messages.error(request, 'Можно удалять только новые заказы.')
             return redirect('order_detail', pk=pk)
-    
+
     elif request.user.role == 'manager':
         # Менеджер может удалять любые заказы
         pass
-    
+
     else:
         # Модельер/Ювелир не может удалять заказы
         messages.error(request, 'У вас нет прав на удаление заказов.')
         return redirect('order_list')
-    
+
     if request.method == 'POST':
         order_id = order.order_id
         order.delete()
         messages.success(request, f'Заказ #{order_id} удален.')
         return redirect('order_list')
-    
+
     return render(request, 'orders/order_confirm_delete.html', {'order': order})
 
 
@@ -139,7 +237,7 @@ def order_delete(request, pk):
 def assign_order(request, pk):
     """Назначение заказа исполнителю - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
     order = get_object_or_404(Order, pk=pk)
-    
+
     if request.method == 'POST':
         worker_id = request.POST.get('worker_id')
         if worker_id:
@@ -149,7 +247,7 @@ def assign_order(request, pk):
             order.save()
             messages.success(request, f'Заказ назначен исполнителю {worker.username}')
         return redirect('order_detail', pk=pk)
-    
+
     workers = User.objects.filter(role__in=['modeler', 'jeweler'], is_active=True)
     return render(request, 'orders/assign_order.html', {
         'order': order,
@@ -161,15 +259,15 @@ def assign_order(request, pk):
 def document_list(request, order_id):
     """Список документов заказа"""
     order = get_object_or_404(Order, pk=order_id)
-    
+
     # Проверка прав доступа
     if request.user.role == 'client':
         if not order.customer or order.customer.user != request.user:
             messages.error(request, 'У вас нет доступа к этому заказу.')
             return redirect('order_list')
-    
+
     documents = Document.objects.filter(order=order).order_by('-document_date')
-    
+
     return render(request, 'orders/document_list.html', {
         'order': order,
         'documents': documents
@@ -180,14 +278,14 @@ def document_list(request, order_id):
 def document_create(request, order_id):
     """Создание документа - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
     order = get_object_or_404(Order, pk=order_id)
-    
+
     if request.method == 'POST':
         form = DocumentCreateForm(request.POST)
         if form.is_valid():
             document = form.save(commit=False)
             document.order = order
             document.created_by = request.user
-            
+
             # Авто-генерация номера документа если не указан
             if not document.document_number:
                 doc_type_prefix = {
@@ -196,29 +294,31 @@ def document_create(request, order_id):
                     'act': 'АКТ',
                     'contract': 'ДОГ',
                 }.get(document.document_type, 'ДОК')
-                
+
                 document.document_number = f"{doc_type_prefix}-{order.order_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            
+
             document.save()
             messages.success(request, f'Документ {document.document_number} успешно создан!')
             return redirect('document_list', order_id=order.order_id)
     else:
-        # Предзаполнение суммой из бюджета заказа
+        # Предзаполнение суммой из бюджета или final_price заказа
         initial_data = {}
-        if order.budget:
+        if order.final_price:
+            initial_data['amount'] = order.final_price
+        elif order.budget:
             initial_data['amount'] = order.budget
         form = DocumentCreateForm(initial=initial_data)
-    
+
     return render(request, 'orders/document_create.html', {
         'form': form,
         'order': order
     })
-    
+
 def document_export_pdf(request, pk):
     """Экспорт документа в PDF"""
     document = get_object_or_404(Document, pk=pk)
     order = document.order
-    
+
     # Выбираем генератор по типу документа
     if document.document_type == 'invoice':
         pdf_buffer = generate_invoice_pdf(order, document)
@@ -232,7 +332,7 @@ def document_export_pdf(request, pk):
     else:
         filename = f"Документ_{document.document_number}.pdf"
         pdf_buffer = generate_invoice_pdf(order, document)
-    
+
     return FileResponse(pdf_buffer, as_attachment=True, filename=filename)
 
 
@@ -240,7 +340,7 @@ def document_export_pdf(request, pk):
 def document_update(request, pk):
     """Редактирование документа - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
     document = get_object_or_404(Document, pk=pk)
-    
+
     if request.method == 'POST':
         form = DocumentUpdateForm(request.POST, instance=document)
         if form.is_valid():
@@ -249,7 +349,7 @@ def document_update(request, pk):
             return redirect('document_list', order_id=document.order.order_id)
     else:
         form = DocumentUpdateForm(instance=document)
-    
+
     return render(request, 'orders/document_update.html', {
         'form': form,
         'document': document
@@ -261,18 +361,18 @@ def document_delete(request, pk):
     """Удаление документа - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
     document = get_object_or_404(Document, pk=pk)
     order_id = document.order.order_id
-    
+
     if request.method == 'POST':
         document_number = document.document_number
         document.delete()
         messages.success(request, f'Документ {document_number} удалён.')
         return redirect('document_list', order_id=order_id)
-    
+
     return render(request, 'orders/document_confirm_delete.html', {
         'document': document
     })
-    
-    
+
+
 @manager_required
 def report_form(request):
     """Форма для выбора периода отчёта - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
@@ -285,7 +385,7 @@ def report_generate(request):
     # Получаем даты из запроса
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
-    
+
     # Валидация дат
     try:
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
@@ -293,19 +393,19 @@ def report_generate(request):
     except:
         messages.error(request, 'Неверный формат дат.')
         return redirect('report_form')
-    
+
     # Вычисляем количество дней
     period_days = (end_date - start_date).days + 1
-    
+
     # Получаем заказы за период
     orders = Order.objects.filter(
         created_at__date__gte=start_date,
         created_at__date__lte=end_date
     )
-    
+
     # Генерируем данные отчёта
     report_data = generate_report_data(orders)
-    
+
     return render(request, 'orders/report_view.html', {
         'start_date': start_date,
         'end_date': end_date,
@@ -321,25 +421,44 @@ def report_export_pdf(request):
     """Экспорт отчёта в PDF - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА"""
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
-    
+
     try:
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
     except:
         messages.error(request, 'Неверный формат дат.')
         return redirect('report_form')
-    
+
     # Получаем заказы
     orders = Order.objects.filter(
         created_at__date__gte=start_date,
         created_at__date__lte=end_date
     )
-    
+
     # Генерируем данные
     report_data = generate_report_data(orders)
-    
+
     # Генерируем PDF
     pdf_buffer = generate_report_pdf(start_date, end_date, report_data)
-    
+
     filename = f"Отчёт_{start_date.strftime('%d.%m.%Y')}-{end_date.strftime('%d.%m.%Y')}.pdf"
+    return FileResponse(pdf_buffer, as_attachment=True, filename=filename)
+
+@manager_required
+def generate_modeler_brief(request, pk):
+    """
+    Генерация ТЗ для модельера - ТОЛЬКО ДЛЯ МЕНЕДЖЕРА
+    """
+    order = get_object_or_404(Order, pk=pk)
+    
+    # Импортируем функцию генерации
+    from .document_generator import generate_brief_pdf
+    
+    # Генерируем PDF
+    pdf_buffer = generate_brief_pdf(order)
+    
+    # Формируем имя файла
+    filename = f"ТЗ_Заказ_{order.order_id}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    
+    # Возвращаем PDF для скачивания
     return FileResponse(pdf_buffer, as_attachment=True, filename=filename)

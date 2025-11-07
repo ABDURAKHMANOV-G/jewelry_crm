@@ -30,7 +30,9 @@ def generate_report_data(orders):
     
     # Общая статистика
     total_orders = orders.count()
-    total_revenue = orders.aggregate(total=Sum('budget'))['total'] or 0
+    total_revenue = orders.filter(
+        final_price__isnull=False
+    ).aggregate(total=Sum('final_price'))['total'] or 0
     
     # По статусам
     status_stats = orders.values('order_status').annotate(count=Count('order_id')).order_by('-count')
@@ -44,11 +46,16 @@ def generate_report_data(orders):
     # Топ-5 клиентов по количеству заказов
     top_customers = orders.values('customer__name', 'customer__surname').annotate(
         count=Count('order_id'),
-        total_spent=Sum('budget')
-    ).order_by('-count')[:5]
+        total_spent=Sum('final_price')
+    ).order_by('-total_spent')[:5]
+    
+    confirmed_orders = orders.filter(
+        final_price__isnull=False,
+        final_price__gt=0
+    ).count()
     
     # Средний чек
-    avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+    avg_order_value = (total_revenue / confirmed_orders if confirmed_orders > 0 else 0)
     
     return {
         'total_orders': total_orders,

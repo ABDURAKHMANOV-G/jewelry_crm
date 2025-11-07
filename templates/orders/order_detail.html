@@ -5,8 +5,17 @@
 
 {% block content %}
 <section class="order-detail-section">
+    {% if messages %}
+    <div class="alerts" style="margin-bottom: 20px;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert" style="...">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="container-detail">
-        
+
         <!-- HEADER с статусом и навигацией -->
         <div class="detail-header">
             <div class="detail-title-block">
@@ -21,12 +30,21 @@
                     {{ order.get_status_display_ru }}
                 </span>
             </div>
-            
+
             <div class="detail-actions">
                 <a href="{% url 'document_list' order.order_id %}" class="btn-action btn-documents">
                     <i class="bi bi-file-earmark-text"></i> Документы
                 </a>
                 
+                <!-- ✅ НОВАЯ КНОПКА для генерации ТЗ -->
+                {% if user.role == 'manager' %}
+                <a href="{% url 'generate_modeler_brief' order.order_id %}" 
+                class="btn-action btn-brief"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-file-earmark-arrow-down"></i> Создать ТЗ для модельера
+                </a>
+                {% endif %}
+
                 {% if user.role == 'manager' or user.role == 'client' and order.order_status == 'new' %}
                 <a href="{% url 'order_delete' order.order_id %}" 
                    class="btn-action btn-delete"
@@ -39,14 +57,14 @@
 
         <!-- GRID: Левая и правая колонки -->
         <div class="detail-grid">
-            
+
             <!-- ЛЕВАЯ КОЛОНКА: Основная информация о заказе -->
             <div class="detail-card detail-card-main">
                 <h2 class="card-title">
                     <i class="bi bi-info-circle"></i>
                     Информация о заказе
                 </h2>
-                
+
                 <div class="info-group">
                     <div class="info-item">
                         <span class="info-label">Тип изделия</span>
@@ -58,7 +76,7 @@
                             {% else %}-{% endif %}
                         </span>
                     </div>
-                    
+
                     <div class="info-item">
                         <span class="info-label">Тип заказа</span>
                         <span class="info-value">
@@ -69,7 +87,7 @@
                             {% else %}-{% endif %}
                         </span>
                     </div>
-                    
+
                     {% if order.material %}
                     <div class="info-item">
                         <span class="info-label">Материал</span>
@@ -83,13 +101,42 @@
                     </div>
                     {% endif %}
                     
+                    <!-- 🔴 НОВОЕ: Рассчитанная цена -->
+                    {% if order.estimated_price %}
+                    <div class="info-item">
+                        <span class="info-label">Предложенная цена</span>
+                        <span class="info-value" style="color: #d4af37; font-weight: 600;">
+                            {{ order.estimated_price|floatformat:0 }} ₽
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="info-item">
+                        <span class="info-label">Предложенная цена</span>
+                        <span class="info-value" style="color: #999;">
+                            Рассчитается при редактировании
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if order.final_price %}
+                    <div class="info-item">
+                        <span class="info-label">Установленная цена</span>
+                        <span class="info-value" style="color: #28a745; font-weight: 600;">
+                            {{ order.final_price|floatformat:0 }} ₽
+                            {% if order.price_confirmed %}
+                            <span style="display: block; color: #28a745; font-size: 11px; margin-top: 3px;">✓ Подтверждена</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+
                     {% if order.budget %}
                     <div class="info-item">
                         <span class="info-label">Бюджет</span>
                         <span class="info-value budget">{{ order.budget }} ₽</span>
                     </div>
                     {% endif %}
-                    
+
                     {% if order.required_by %}
                     <div class="info-item">
                         <span class="info-label">Дата готовности</span>
@@ -98,27 +145,27 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- ПРАВАЯ КОЛОНКА: Клиент -->
             <div class="detail-card">
                 <h2 class="card-title">
                     <i class="bi bi-person"></i>
                     Информация о клиенте
                 </h2>
-                
+
                 <div class="info-group">
                     <div class="info-item">
                         <span class="info-label">Имя</span>
                         <span class="info-value">{{ order.customer.name }} {{ order.customer.surname }}</span>
                     </div>
-                    
+
                     <div class="info-item">
                         <span class="info-label">Телефон</span>
                         <span class="info-value">
                             <a href="tel:{{ order.customer.phone }}">{{ order.customer.phone|format_phone }}</a>
                         </span>
                     </div>
-                    
+
                     {% if order.customer.email %}
                     <div class="info-item">
                         <span class="info-label">Email</span>
@@ -130,6 +177,18 @@
                 </div>
             </div>
         </div>
+        <!-- 🔴 РАЗМЕРЫ В ЗАВИСИМОСТИ ОТ ТИПА ЗАКАЗА -->
+        <div class="detail-card detail-params" id="parametersBlock">
+            <h2 class="card-title">
+                <i class="bi bi-rulers"></i>
+                <span id="paramsTitle">Размеры изделия</span>
+            </h2>
+            <div class="params-grid" id="paramsContent">
+                <p style="color: #999;">Загрузка параметров...</p>
+            </div>
+        </div>
+
+        
 
         <!-- ПАРАМЕТРЫ для CUSTOM заказа -->
         {% if order.order_type == 'custom' %}
@@ -145,28 +204,28 @@
                     <span class="param-value">{{ order.ring_size }}</span>
                 </div>
                 {% endif %}
-                
+
                 {% if order.thickness %}
                 <div class="param-item">
                     <span class="param-label">Толщина</span>
                     <span class="param-value">{{ order.thickness }} мм</span>
                 </div>
                 {% endif %}
-                
+
                 {% if order.width %}
                 <div class="param-item">
                     <span class="param-label">Ширина</span>
                     <span class="param-value">{{ order.width }} мм</span>
                 </div>
                 {% endif %}
-                
+
                 {% if order.stone_size %}
                 <div class="param-item">
                     <span class="param-label">Размер камня</span>
                     <span class="param-value">{{ order.stone_size }} карат</span>
                 </div>
                 {% endif %}
-                
+
                 {% if order.desired_weight %}
                 <div class="param-item">
                     <span class="param-label">Желаемый вес</span>
@@ -189,7 +248,7 @@
                     <span class="info-label">Выбранный шаблон</span>
                     <span class="info-value">{{ order.template_image|default:"-" }}</span>
                 </div>
-                
+
                 {% if order.product_type == 'ring' and order.ring_size %}
                 <div class="info-item">
                     <span class="info-label">Размер кольца</span>
@@ -226,7 +285,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="detail-card">
                 <h2 class="card-title">
                     <i class="bi bi-clock-history"></i>
@@ -252,25 +311,82 @@
                 <i class="bi bi-pencil-square"></i>
                 Редактирование заказа (менеджер)
             </h2>
-            
+
             <form method="POST" id="managerEditForm" class="manager-form">
                 {% csrf_token %}
-                
+
                 <!-- Статус и исполнитель -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="id_order_status">Статус заказа</label>
                         {{ update_form.order_status }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_user">Исполнитель</label>
                         {{ update_form.user }}
                     </div>
                 </div>
-                
+
                 <div class="form-divider"></div>
-                
+
+                <!-- Утверждение цены (для менеджера) -->
+                <h3 class="form-section-title">
+                    <i class="bi bi-currency-dollar"></i>
+                    Финансовое подтверждение
+                </h3>
+
+                <!-- Бюджет клиента (только показываем) -->
+                <div class="form-group">
+                    <label>Бюджет клиента (₽)</label>
+                    <div style="padding: 12px 14px; background: rgba(255, 255, 255, 0.03); 
+                                border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; color: #cccccc;">
+                        {{ order.budget }} ₽
+                    </div>
+                    <small class="form-hint">Бюджет, указанный клиентом при создании заказа</small>
+                </div>
+
+                <!-- Предложенная цена (только показываем) -->
+                <div class="form-group">
+                    <label class="form-label">Предложенная цена системой</label>
+                    <div class="proposed-price-container" style="margin-top: 8px;">
+                        <span class="proposed-price-value" id="estimated_price_display">
+                            {{ order.estimated_price|default:"Рассчитается"|floatformat:0 }} ₽
+                        </span>
+                        <small class="form-hint">
+                            Автоматически рассчитана на основе материала, типа и коэффициентов
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Утвержденная цена (ПОЛЕ ДЛЯ РЕДАКТИРОВАНИЯ) -->
+                <div class="form-group">
+                    <label for="id_final_price" class="form-label">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Окончательная цена (₽) *
+                    </label>
+                    {{ update_form.final_price }}
+                    <small class="form-hint">
+                        Установите финальную цену для этого заказа.
+                        <button 
+                            type="button" 
+                            onclick="applyEstimatedPrice(event);" 
+                            style="
+                                background: #d4af37;
+                                color: #1a1a1a;
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 14px;
+                                margin-left: 10px;
+                            "
+                        >
+                            Применить предложенную ✓
+                        </button>
+                    </small>
+                </div>
                 <!-- Тип изделия и тип заказа -->
                 <h3 class="form-section-title">Основные параметры</h3>
                 <div class="form-row">
@@ -278,7 +394,7 @@
                         <label for="id_product_type">Тип изделия</label>
                         {{ update_form.product_type }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_order_type_edit">Тип заказа</label>
                         <select name="order_type" id="id_order_type_edit" class="form-control">
@@ -288,83 +404,79 @@
                         </select>
                     </div>
                 </div>
-                
-                <!-- ШАБЛОННЫЙ ЗАКАЗ -->
+
+                <!-- ✅ ОБЩЕЕ ПОЛЕ RING_SIZE (для обоих типов) -->
+                <div class="form-group" id="ringSizeGroup" style="display: none;">
+                    <label for="id_ring_size">Размер кольца</label>
+                    {{ update_form.ring_size }}
+                    <small class="form-hint">Для колец</small>
+                </div>
+
+                <!-- ШАБЛОННЫЙ ЗАКАЗ (БЕЗ ring_size) -->
                 <div id="templateEditSection" style="display: none;">
                     <div class="form-divider"></div>
                     <h3 class="form-section-title">📋 Параметры шаблонного заказа</h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="id_template_image">Изображение шаблона</label>
-                            {{ update_form.template_image }}
-                        </div>
-                        
-                        <div class="form-group" id="templateRingSizeEdit">
-                            <label for="id_ring_size">Размер кольца</label>
-                            {{ update_form.ring_size }}
-                            <small class="form-hint">Только для колец</small>
-                        </div>
+
+                    <div class="form-group">
+                        <label for="id_template_image">Изображение шаблона</label>
+                        {{ update_form.template_image }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_material">Материал</label>
                         {{ update_form.material }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_comment">Комментарий</label>
                         {{ update_form.comment }}
                     </div>
                 </div>
-                
-                <!-- ИНДИВИДУАЛЬНЫЙ ЗАКАЗ -->
+
+                <!-- ИНДИВИДУАЛЬНЫЙ ЗАКАЗ (БЕЗ ring_size) -->
                 <div id="customEditSection" style="display: none;">
                     <div class="form-divider"></div>
                     <h3 class="form-section-title">✏️ Параметры индивидуального заказа</h3>
-                    
+
                     <div class="form-row form-row-3">
-                        <div class="form-group">
-                            <label for="id_ring_size">Размер</label>
-                            {{ update_form.ring_size }}
-                        </div>
+                        <!-- ❌ УДАЛИЛИ ring_size отсюда -->
                         
                         <div class="form-group">
                             <label for="id_thickness">Толщина (мм)</label>
                             {{ update_form.thickness }}
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="id_width">Ширина (мм)</label>
                             {{ update_form.width }}
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="id_stone_size">Размер камня (карат)</label>
                             {{ update_form.stone_size }}
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="id_desired_weight">Желаемый вес (г)</label>
                             {{ update_form.desired_weight }}
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_material">Материал</label>
                         {{ update_form.material }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_comment">Комментарий</label>
                         {{ update_form.comment }}
                     </div>
                 </div>
-                
+
                 <div class="form-divider"></div>
-                
+
                 <!-- Бюджет и срок -->
                 <h3 class="form-section-title">💰 Финансы и сроки</h3>
                 <div class="form-row">
@@ -372,13 +484,13 @@
                         <label for="id_budget">Бюджет (₽)</label>
                         {{ update_form.budget }}
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="id_required_by">Желаемая дата готовности</label>
                         {{ update_form.required_by }}
                     </div>
                 </div>
-                
+
                 <button type="submit" class="btn-gold btn-lg-full">
                     <i class="bi bi-save"></i> Сохранить изменения
                 </button>
@@ -390,57 +502,317 @@
 </section>
 
 <script>
-// Показываем нужные поля при загрузке страницы
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateParametersBlock() {
+            const orderType = '{{ order.order_type }}';
+            const productType = '{{ order.product_type }}';
+            const paramsContent = document.getElementById('paramsContent');
+            const paramsTitle = document.getElementById('paramsTitle');
+            
+            let html = '';
+            
+            if (orderType === 'template') {
+                paramsTitle.textContent = '📋 Параметры шаблонного заказа';
+                
+                const template = '{{ order.template_image|default:"—" }}';
+                html += `
+                    <div class="param-item">
+                        <span class="param-label">Шаблон</span>
+                        <span class="param-value">${template}</span>
+                    </div>
+                `;
+                
+                
+                    const ringSize = '{{ order.ring_size|default:"—" }}';
+                    html += `
+                        <div class="param-item">
+                            <span class="param-label">Размер</span>
+                            <span class="param-value">${ringSize}</span>
+                        </div>
+                    `;
+                
+                
+            } else if (orderType === 'custom') {
+                paramsTitle.textContent = '✏️ Параметры индивидуального заказа';
+                
+                const ring_size = '{{ order.ring_size|default:"—" }}';
+                const thickness = '{{ order.thickness|default:"—" }}';
+                const width = '{{ order.width|default:"—" }}';
+                const stone_size = '{{ order.stone_size|default:"—" }}';
+                const desired_weight = '{{ order.desired_weight|default:"—" }}';
+                
+                html += `
+                    <div class="param-item">
+                        <span class="param-label">Размер</span>
+                        <span class="param-value">${ring_size}</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-label">Толщина</span>
+                        <span class="param-value">${thickness} ${thickness !== '—' ? 'мм' : ''}</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-label">Ширина</span>
+                        <span class="param-value">${width} ${width !== '—' ? 'мм' : ''}</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-label">Размер камня</span>
+                        <span class="param-value">${stone_size} ${stone_size !== '—' ? 'карат' : ''}</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-label">Желаемый вес</span>
+                        <span class="param-value">${desired_weight} ${desired_weight !== '—' ? 'г' : ''}</span>
+                    </div>
+                `;
+            }
+            
+            if (html) {
+                paramsContent.innerHTML = html;
+            } else {
+                paramsContent.innerHTML = '<p style="color: #999;">Нет параметров</p>';
+            }
+        }
+        
+        updateParametersBlock();
+    });
+    
+// ========================================
+// PRICING CONFIG
+// ========================================
+const PRICING_CONFIG = {
+    materials: {
+        'gold_585': { name: 'Золото 585', pricePerGram: 3500, density: 15.8 },
+        'gold_750': { name: 'Золото 750', pricePerGram: 4200, density: 17.3 },
+        'silver_925': { name: 'Серебро 925', pricePerGram: 45, density: 10.5 },
+        'platinum': { name: 'Платина', pricePerGram: 8500, density: 21.45 }
+    },
+    templateCoefficients: {
+        'ring': {
+            'ring1': { name: 'Классика', coefficient: 1.5 },
+            'ring2': { name: 'Винтаж', coefficient: 1.8 },
+            'ring3': { name: 'Романтик', coefficient: 1.6 }
+        },
+        'brooch': {
+            'brooch1': { name: 'Цветок', coefficient: 2.2 },
+            'brooch2': { name: 'Бабочка', coefficient: 2.0 }
+        },
+        'bracelet': {
+            'bracelet1': { name: 'Элегант', coefficient: 1.9 },
+            'bracelet2': { name: 'Модерн', coefficient: 2.1 }
+        },
+        'earrings': {
+            'earring1': { name: 'Капли', coefficient: 1.4 },
+            'earring2': { name: 'Премиум', coefficient: 1.7 }
+        }
+    },
+    productComplexity: {
+        'ring': 1.0,
+        'brooch': 1.3,
+        'bracelet': 1.1,
+        'earrings': 0.9
+    },
+    laborCost: 0.35
+};
+
+function getMaterialPrice(materialType) {
+    return PRICING_CONFIG.materials[materialType]?.pricePerGram || 0;
+}
+
+function getTemplateCoefficient(productType, templateId) {
+    return PRICING_CONFIG.templateCoefficients[productType]?.[templateId]?.coefficient || 1.0;
+}
+
+function getComplexityCoefficient(productType) {
+    return PRICING_CONFIG.productComplexity[productType] || 1.0;
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('ru-RU', {
+        style: 'currency',
+        currency: 'RUB',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    }).format(price);
+}
+
+function calculateTemplatePrice(weight, materialType, templateId, productType) {
+    if (!weight || weight <= 0) return 0;
+    const coefficient = getTemplateCoefficient(productType, templateId);
+    const materialPrice = getMaterialPrice(materialType);
+    const complexityCoeff = getComplexityCoefficient(productType);
+    const baseMaterialCost = weight * materialPrice;
+    const materialWithCoeff = baseMaterialCost * coefficient * complexityCoeff;
+    const totalCost = materialWithCoeff * (1 + PRICING_CONFIG.laborCost);
+    return Math.round(totalCost * 100) / 100;
+}
+
+function calculateCustomPrice(weight, materialType, productType) {
+    if (!weight || weight <= 0) return 0;
+    const materialPrice = getMaterialPrice(materialType);
+    const complexityCoeff = getComplexityCoefficient(productType);
+    const baseMaterialCost = weight * materialPrice * complexityCoeff;
+    const totalCost = baseMaterialCost * (1 + PRICING_CONFIG.laborCost);
+    return Math.round(totalCost * 100) / 100;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const orderTypeSelect = document.getElementById('id_order_type_edit');
     const productTypeSelect = document.getElementById('id_product_type');
-    
-    // Инициализация при загрузке
-    toggleEditSections();
-    
-    // Отслеживаем изменения
+
     if (orderTypeSelect) {
-        orderTypeSelect.addEventListener('change', toggleEditSections);
+        orderTypeSelect.addEventListener('change', function() {
+            toggleEditSections();
+            updateProposedPrice();
+        });
     }
+
     if (productTypeSelect) {
         productTypeSelect.addEventListener('change', function() {
             const orderType = orderTypeSelect ? orderTypeSelect.value : '{{ order.order_type }}';
             const productType = this.value;
-            
-            // Показываем/скрываем размер кольца для шаблонного заказа
+
             if (orderType === 'template' && productType === 'ring') {
                 document.getElementById('templateRingSizeEdit').style.display = 'block';
             } else {
                 document.getElementById('templateRingSizeEdit').style.display = 'none';
             }
+
+            updateProposedPrice();
         });
     }
-    
+
+    const priceFields = [
+        'id_order_type_edit', 'id_product_type', 'id_material', 'id_template_image',
+        'id_ring_size', 'id_thickness', 'id_width', 'id_stone_size', 'id_desired_weight'
+    ];
+
+    priceFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('change', updateProposedPrice);
+            field.addEventListener('input', updateProposedPrice);
+        }
+    });
+
     function toggleEditSections() {
         const orderType = orderTypeSelect ? orderTypeSelect.value : '{{ order.order_type }}';
         const productType = productTypeSelect ? productTypeSelect.value : '{{ order.product_type }}';
-        
+
         const templateSection = document.getElementById('templateEditSection');
         const customSection = document.getElementById('customEditSection');
-        const templateRingSize = document.getElementById('templateRingSizeEdit');
-        
+        const ringSizeGroup = document.getElementById('ringSizeGroup');
+
         // Скрываем все секции
         if (templateSection) templateSection.style.display = 'none';
         if (customSection) customSection.style.display = 'none';
-        if (templateRingSize) templateRingSize.style.display = 'none';
-        
+        if (ringSizeGroup) ringSizeGroup.style.display = 'none';
+
+        console.log('Toggle:', { orderType, productType });
+
         // Показываем нужную секцию
         if (orderType === 'template') {
             if (templateSection) templateSection.style.display = 'block';
             
-            // Для колец показываем размер
-            if (productType === 'ring' && templateRingSize) {
-                templateRingSize.style.display = 'block';
+            // ✅ Показываем ring_size только для колец
+            if (productType === 'ring' && ringSizeGroup) {
+                ringSizeGroup.style.display = 'block';
+                console.log('✅ Showing ring_size for TEMPLATE ring');
             }
         } else if (orderType === 'custom') {
             if (customSection) customSection.style.display = 'block';
+            
+            // ✅ Показываем ring_size для всех индивидуальных заказов
+            if (ringSizeGroup) {
+                ringSizeGroup.style.display = 'block';
+                console.log('✅ Showing ring_size for CUSTOM order');
+            }
         }
     }
+
+    function updateProposedPrice() {
+        const orderType = document.getElementById('id_order_type_edit')?.value;
+        const material = document.getElementById('id_material')?.value;
+        const productType = document.getElementById('id_product_type')?.value;
+
+        let proposedPrice = 0;
+
+        if (orderType === 'template') {
+            const templateId = document.getElementById('id_template_image')?.value;
+            const ringSize = document.getElementById('id_ring_size')?.value;
+
+            let weight = 3;
+            if (productType === 'ring' && ringSize) {
+                weight = Math.max(2, ringSize * 0.4);
+            } else if (productType === 'brooch') {
+                weight = 8;
+            } else if (productType === 'bracelet') {
+                weight = 12;
+            } else if (productType === 'earrings') {
+                weight = 2;
+            }
+
+            proposedPrice = calculateTemplatePrice(weight, material, templateId, productType);
+        } else if (orderType === 'custom') {
+            const desiredWeight = parseFloat(document.getElementById('id_desired_weight')?.value) || 0;
+            proposedPrice = calculateCustomPrice(desiredWeight, material, productType);
+        }
+
+        const priceField = document.getElementById('estimated_price_display');
+        const formField = document.getElementById('id_estimated_price');
+        
+        if (priceField) {
+            priceField.textContent = formatPrice(proposedPrice) || '0 ₽';
+            priceField.dataset.value = proposedPrice;
+        }
+        
+        if (formField) {
+            formField.value = proposedPrice;
+        }
+    }
+
+    toggleEditSections();
+    updateProposedPrice();
+
 });
+
+window.applyEstimatedPrice = function(e) {
+    if (e) e.preventDefault();
+    
+    const estimatedValue = document.getElementById('estimated_price_display')?.dataset.value;
+    const finalPriceField = document.getElementById('id_final_price');
+    
+    if (estimatedValue !== undefined && finalPriceField) {
+        const numValue = parseFloat(estimatedValue);
+        if (!isNaN(numValue)) {
+            finalPriceField.value = numValue;
+            finalPriceField.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+}
+const form = document.getElementById('managerEditForm');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        console.log('=== FORM SUBMIT ===');
+        const formData = new FormData(this);
+        
+        for (let [key, value] of formData.entries()) {
+            if (key === 'ring_size') {
+                console.log('✅ Ring Size будет отправлен:', value);
+            }
+        }
+        
+        // Показываем все поля перед отправкой (чтобы не потерять данные)
+        const allHiddenDivs = this.querySelectorAll('[style*="display: none"]');
+        allHiddenDivs.forEach(div => {
+            const inputs = div.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name && input.value) {
+                    console.log('Field from hidden div:', input.name, '=', input.value);
+                }
+            });
+        });
+    });
+}
+
 </script>
 {% endblock %}

@@ -560,3 +560,255 @@ def generate_contract_pdf(order, document):
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
+def generate_brief_pdf(order):
+    """
+    Генерирует ТЗ (техническое задание) для модельера в PDF
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, 
+                           rightMargin=20*mm, leftMargin=20*mm,
+                           topMargin=15*mm, bottomMargin=15*mm)
+    
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # ========================================
+    # СТИЛИ С ИСПОЛЬЗОВАНИЕМ ГЛОБАЛЬНЫХ ШРИФТОВ
+    # ========================================
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontName=FONT_NAME_BOLD,
+        fontSize=18,
+        textColor=colors.HexColor('#1a1a1a'),
+        spaceAfter=12,
+        alignment=1  # Центр
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontName=FONT_NAME_BOLD,
+        fontSize=14,
+        textColor=colors.HexColor('#d4af37'),
+        spaceAfter=10,
+        spaceBefore=15
+    )
+    
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=11,
+        leading=16
+    )
+    
+    # ========================================
+    # ЗАГОЛОВОК
+    # ========================================
+    story.append(Paragraph("<b>ТЕХНИЧЕСКОЕ ЗАДАНИЕ</b>", title_style))
+    story.append(Paragraph(f"Заказ #{order.order_id}", title_style))
+    story.append(Spacer(1, 10*mm))
+    
+    # ========================================
+    # ОСНОВНАЯ ИНФОРМАЦИЯ
+    # ========================================
+    story.append(Paragraph("<b>1. ОСНОВНАЯ ИНФОРМАЦИЯ</b>", heading_style))
+    
+    info_data = [
+        ['Дата создания ТЗ:', datetime.now().strftime('%d.%m.%Y %H:%M')],
+        ['Заказ №:', str(order.order_id)],
+        ['Дата создания заказа:', order.created_at.strftime('%d.%m.%Y')],
+        ['Требуемая дата готовности:', order.required_by.strftime('%d.%m.%Y %H:%M') if order.required_by else '—'],
+    ]
+    
+    if order.user:
+        info_data.append(['Исполнитель:', order.user.get_full_name() or order.user.username])
+    
+    info_table = Table(info_data, colWidths=[60*mm, 110*mm])
+    info_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
+        ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    story.append(info_table)
+    story.append(Spacer(1, 8*mm))
+    
+    # ========================================
+    # ИНФОРМАЦИЯ О КЛИЕНТЕ
+    # ========================================
+    story.append(Paragraph("<b>2. ИНФОРМАЦИЯ О КЛИЕНТЕ</b>", heading_style))
+    
+    customer = order.customer
+    client_data = [
+        ['ФИО:', f"{customer.name} {customer.surname}"],
+        ['Телефон:', customer.phone],
+    ]
+    
+    if customer.email:
+        client_data.append(['Email:', customer.email])
+    
+    client_table = Table(client_data, colWidths=[60*mm, 110*mm])
+    client_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
+        ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    story.append(client_table)
+    story.append(Spacer(1, 8*mm))
+    
+    # ========================================
+    # СПЕЦИФИКАЦИЯ ИЗДЕЛИЯ
+    # ========================================
+    story.append(Paragraph("<b>3. СПЕЦИФИКАЦИЯ ИЗДЕЛИЯ</b>", heading_style))
+    
+    # УБРАЛ ЭМОДЗИ - используем только текст
+    product_type_display = {
+        'ring': 'Кольцо',
+        'brooch': 'Брошь',
+        'bracelet': 'Браслет',
+        'earrings': 'Серьги'
+    }.get(order.product_type, order.product_type)
+    
+    order_type_display = {
+        'template': 'Шаблонный',
+        'custom': 'Индивидуальный'
+    }.get(order.order_type, order.order_type)
+    
+    material_display = {
+        'gold_585': 'Золото 585',
+        'gold_750': 'Золото 750',
+        'silver_925': 'Серебро 925',
+        'platinum': 'Платина'
+    }.get(order.material, order.material or '—')
+    
+    spec_data = [
+        ['Тип изделия:', product_type_display],
+        ['Тип заказа:', order_type_display],
+        ['Материал:', material_display],
+    ]
+    
+    spec_table = Table(spec_data, colWidths=[60*mm, 110*mm])
+    spec_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
+        ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    story.append(spec_table)
+    story.append(Spacer(1, 8*mm))
+    
+    # ========================================
+    # ПАРАМЕТРЫ ИЗДЕЛИЯ
+    # ========================================
+    story.append(Paragraph("<b>4. ТЕХНИЧЕСКИЕ ПАРАМЕТРЫ</b>", heading_style))
+    
+    params_data = []
+    
+    if order.order_type == 'template':
+        if order.template_image:
+            params_data.append(['Шаблон:', order.template_image])
+        if order.product_type == 'ring' and order.ring_size:
+            params_data.append(['Размер кольца:', str(order.ring_size)])
+    
+    elif order.order_type == 'custom':
+        if order.ring_size:
+            params_data.append(['Размер:', str(order.ring_size)])
+        if order.thickness:
+            params_data.append(['Толщина:', f"{order.thickness} мм"])
+        if order.width:
+            params_data.append(['Ширина:', f"{order.width} мм"])
+        if order.stone_size:
+            params_data.append(['Размер камня:', f"{order.stone_size} карат"])
+        if order.desired_weight:
+            params_data.append(['Желаемый вес:', f"{order.desired_weight} г"])
+    
+    if params_data:
+        params_table = Table(params_data, colWidths=[60*mm, 110*mm])
+        params_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
+            ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        story.append(params_table)
+    else:
+        story.append(Paragraph("Параметры не указаны", normal_style))
+    
+    story.append(Spacer(1, 8*mm))
+    
+    # ========================================
+    # КОММЕНТАРИЙ КЛИЕНТА
+    # ========================================
+    if order.comment:
+        story.append(Paragraph("<b>5. ПОЖЕЛАНИЯ КЛИЕНТА</b>", heading_style))
+        story.append(Paragraph(order.comment, normal_style))
+        story.append(Spacer(1, 8*mm))
+    
+    # ========================================
+    # ФИНАНСОВАЯ ИНФОРМАЦИЯ
+    # ========================================
+    story.append(Paragraph("<b>6. ФИНАНСОВАЯ ИНФОРМАЦИЯ</b>", heading_style))
+    
+    finance_data = []
+    
+    if order.budget:
+        finance_data.append(['Бюджет клиента:', f"{order.budget:,.0f} руб."])
+    
+    if order.estimated_price:
+        finance_data.append(['Предложенная цена:', f"{order.estimated_price:,.0f} руб."])
+    
+    if order.final_price:
+        finance_data.append(['Утвержденная цена:', f"{order.final_price:,.0f} руб."])
+    
+    if finance_data:
+        finance_table = Table(finance_data, colWidths=[60*mm, 110*mm])
+        finance_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
+            ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        story.append(finance_table)
+    
+    story.append(Spacer(1, 15*mm))
+    
+    # ========================================
+    # ПОДПИСЬ
+    # ========================================
+    story.append(Paragraph("_______________________________", normal_style))
+    story.append(Paragraph("Подпись модельера", normal_style))
+    
+    # Генерация PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer

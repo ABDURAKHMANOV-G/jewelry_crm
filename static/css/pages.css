@@ -5008,3 +5008,199 @@ select {
         margin-left: 0;
     }
 }
+
+
+/* ========================================
+   PRICING & PROPOSED PRICE STYLES
+   ======================================== */
+
+.proposed-price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.02) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+}
+
+.proposed-price-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #d4af37;
+    letter-spacing: 0.5px;
+}
+
+.form-hint {
+    color: #999999;
+    font-size: 12px;
+    font-style: italic;
+}
+
+#priceApprovalForm {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(212, 175, 55, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+}
+
+.price-approval-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.approval-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+}
+
+.approval-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.approval-label {
+    color: #cccccc;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.approval-value {
+    color: #d4af37;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.price-input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+#id_approved_price {
+    flex: 1;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#id_approved_price:focus {
+    outline: none;
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.08);
+}
+
+.btn-apply-proposed {
+    padding: 12px 24px;
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-apply-proposed:hover {
+    background: rgba(212, 175, 55, 0.3);
+}
+
+.btn-toggle-approval {
+    padding: 10px 20px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-approval:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .approval-info {
+        grid-template-columns: 1fr;
+    }
+
+    .price-input-wrapper {
+        flex-direction: column;
+    }
+
+    .proposed-price-value {
+        font-size: 20px;
+    }
+}
+
+/* ========================================
+   PRICING STYLES
+   ======================================== */
+
+.proposed-price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.02) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+}
+
+.proposed-price-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #d4af37;
+    letter-spacing: 0.5px;
+}
+
+#id_approved_price {
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#id_approved_price:focus {
+    outline: none;
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.08);
+}
+
+.btn-brief {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-brief:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}

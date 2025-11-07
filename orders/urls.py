@@ -19,4 +19,6 @@ urlpatterns = [
     path('reports/', views.report_form, name='report_form'),
     path('reports/generate/', views.report_generate, name='report_generate'),
     path('reports/export-pdf/', views.report_export_pdf, name='report_export_pdf'),
+    
+    path('order/<int:pk>/generate-brief/', views.generate_modeler_brief, name='generate_modeler_brief'),
 ]

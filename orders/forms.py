@@ -157,11 +157,24 @@ class OrderUpdateForm(forms.ModelForm):
         label='Тип заказа'
     )
     
+    TEMPLATE_CHOICES = [
+        ('', '------'),
+        ('ring1', 'Классика'),
+        ('ring2', 'Винтаж'),
+        ('ring3', 'Романтик'),
+        ('brooch1', 'Цветок'),
+        ('brooch2', 'Бабочка'),
+        ('bracelet1', 'Элегант'),
+        ('bracelet2', 'Модерн'),
+        ('earring1', 'Капли'),
+        ('earring2', 'Премиум'),
+    ]
+    
     # Шаблонный заказ
-    template_image = forms.CharField(
-        max_length=200,
+    template_image = forms.ChoiceField(
+        choices=TEMPLATE_CHOICES,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label='Шаблон изображения'
     )
     
@@ -248,13 +261,47 @@ class OrderUpdateForm(forms.ModelForm):
         label='Срок выполнения'
     )
     
+    # 🔴 НОВЫЕ ПОЛЯ ДЛЯ ЦЕНООБРАЗОВАНИЯ:
+    estimated_price = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'readonly': True,
+            'placeholder': '0.00'
+        }),
+        label='Предложенная цена системой (₽)'
+    )
+
+    final_price = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '0.00'
+        }),
+        label='Окончательная цена (₽)'
+    )
+
+    price_confirmed = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        label='Цена подтверждена'
+    )
+
+    
     class Meta:
         model = Order
         fields = [
             'order_status', 'user', 
             'product_type', 'order_type', 'template_image',
             'ring_size', 'thickness', 'width', 'stone_size', 'desired_weight',
-            'material', 'comment', 'budget', 'required_by'
+            'material', 'comment', 'budget', 'required_by',
+            'estimated_price', 'final_price', 'price_confirmed'
         ]
     
     def __init__(self, *args, **kwargs):

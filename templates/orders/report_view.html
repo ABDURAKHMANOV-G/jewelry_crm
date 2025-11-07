@@ -195,7 +195,16 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                <span class="report-amount">{{ order.budget|default:"—" }} ₽</span>
+                                <span class="report-amount">
+                                    {% if order.final_price %}
+                                        {{ order.final_price|floatformat:0 }} ₽
+                                        {% if order.price_confirmed %}
+                                        <span style="font-size: 11px; color: #28a745;">✓</span>
+                                        {% endif %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </span>
                             </td>
                             <td>
                                 <span class="report-date">{{ order.created_at|date:"d.m.Y" }}</span>
