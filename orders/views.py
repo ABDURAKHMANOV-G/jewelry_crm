@@ -19,7 +19,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import CollectionOrderForm
 from accounts.models import Customer  # ← Исправленный импорт
-
+from django.http import HttpResponse
+import csv
 
 
 # ========================================
@@ -605,3 +606,32 @@ def generate_modeler_brief(request, pk):
     
     # Возвращаем PDF для скачивания
     return FileResponse(pdf_buffer, as_attachment=True, filename=filename)
+
+def export_orders_csv(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthorized', status=401)
+
+    # Для менеджера - все заказы, для клиента - только его заказы
+    if request.user.role == 'manager':
+        orders = Order.objects.all()
+    else:
+        orders = Order.objects.filter(customer__user=request.user)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="orders_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Тип изделия', 'Тип заказа', 'Клиент', 'Статус', 'Бюджет', 'Дата создания'])
+
+    for order in orders:
+        writer.writerow([
+            order.order_id,
+            order.get_product_type_display() if hasattr(order, 'get_product_type_display') else order.product_type,
+            order.get_order_type_display() if hasattr(order, 'get_order_type_display') else order.order_type,
+            f'{order.customer.name} {order.customer.surname}',
+            order.get_status_display_ru(),
+            order.budget or '',
+            order.created_at.strftime('%d.%m.%Y'),
+        ])
+
+    return response

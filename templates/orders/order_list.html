@@ -14,6 +14,11 @@
                     <i class="bi bi-bag-check"></i> Мои заказы
                 {% endif %}
             </h2>
+            {% if user.role == 'manager' %}
+            <a href="{% url 'export_orders_csv' %}" class="btn-gold" style="margin-left: 16px;">
+                <i class="bi bi-download"></i> Экспорт в CSV
+            </a>
+            {% endif %}
             {% if user.role == 'client' %}
             <a href="{% url 'order_create' %}" class="btn-gold">
                 <i class="bi bi-plus-circle"></i> Создать заказ
@@ -31,7 +36,7 @@
                         <th>Тип заказа</th>
                         <th>Клиент</th>
                         <th>Статус</th>
-                        <th>Бюджет</th>
+                        <th>Подтверждённая цена</th>
                         <th>Создан</th>
                         <th>Действия</th>
                     </tr>
@@ -87,18 +92,24 @@
                         
                         <!-- Бюджет / Цена -->
                         <td class="budget">
-                            {% if order.order_type == 'collection' %}
-                                {% if order.collection_product_price %}
-                                    <span style="color: #d4af37; font-weight: 500;">{{ order.collection_product_price|floatformat:0 }} ₽</span>
-                                {% elif order.estimated_price %}
-                                    <span style="color: #d4af37; font-weight: 500;">{{ order.estimated_price|floatformat:0 }} ₽</span>
-                                {% else %}
-                                    -
-                                {% endif %}
+                        {% if order.order_type == 'collection' %}
+                            {% if order.collection_product_price %}
+                                <span style="color: #d4af37; font-weight: 500;">{{ order.collection_product_price|floatformat:0 }} ₽</span>
+                            {% elif order.final_price %}
+                                <span style="color: #28a745; font-weight: 600;">{{ order.final_price|floatformat:0 }} ₽</span>
+                            {% elif order.estimated_price %}
+                                <span style="color: #d4af37; font-weight: 500;">{{ order.estimated_price|floatformat:0 }} ₽</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        {% else %}
+                            {% if order.final_price %}
+                                <span style="color: #28a745; font-weight: 600;">{{ order.final_price|floatformat:0 }} ₽</span>
                             {% else %}
                                 {{ order.budget|default:"-" }} ₽
                             {% endif %}
-                        </td>
+                        {% endif %}
+                    </td>
                         
                         <td class="date">{{ order.created_at|date:"d.m.Y" }}</td>
                         

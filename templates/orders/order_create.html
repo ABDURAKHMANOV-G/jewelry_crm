@@ -260,14 +260,14 @@
                     </div>
                     
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" id="budgetGroup">
                             <label for="id_budget">Бюджет (₽) *</label>
                             {{ form.budget }}
                             {% if form.budget.errors %}
                             <span class="form-error">{{ form.budget.errors|first }}</span>
                             {% endif %}
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="id_required_by">Желаемая дата готовности *</label>
                             {{ form.required_by }}
@@ -417,9 +417,14 @@ function toggleOrderType() {
     const customSection = document.getElementById('customSection');
     const productType = document.getElementById('id_product_type').value;
     const templateRingSizeGroup = document.getElementById('templateRingSizeGroup');
+    const budgetGroup = document.getElementById('budgetGroup');
     
     if (templateSection) templateSection.style.display = 'none';
     if (customSection) customSection.style.display = 'none';
+
+    if (budgetGroup) {
+        budgetGroup.style.display = 'none';  // скрываем по умолчанию
+    }
     
     // Получаем поля
     const templateRingSize = document.getElementById('id_ring_size');
@@ -429,14 +434,11 @@ function toggleOrderType() {
         if (templateSection) templateSection.style.display = 'block';
         initTemplateCarousel();
         
-         // ✅ ВКЛЮЧАЕМ поле шаблонного размера
-        if (templateRingSize) {
-            templateRingSize.disabled = false;
-        }
-        // ❌ ОТКЛЮЧАЕМ поле индивидуального размера
+        // Включаем поле шаблонного размера, отключаем индивидуальное
+        if (templateRingSize) templateRingSize.disabled = false;
         if (customRingSize) {
             customRingSize.disabled = true;
-            customRingSize.value = ''; // Очищаем значение
+            customRingSize.value = '';
         }
 
         if (productType === 'ring' && templateRingSizeGroup) {
@@ -444,21 +446,27 @@ function toggleOrderType() {
         } else if (templateRingSizeGroup) {
             templateRingSizeGroup.style.display = 'none';
         }
+        // Скрываем поле бюджета при шаблонном заказе
+        if (budgetGroup) budgetGroup.style.display = 'none';
+
     } else if (orderType === 'custom') {
         if (customSection) customSection.style.display = 'block';
-         // ❌ ОТКЛЮЧАЕМ поле шаблонного размера
+        
+        // Отключаем поле шаблонного размера, включаем индивидуальное
         if (templateRingSize) {
             templateRingSize.disabled = true;
-            templateRingSize.value = ''; // Очищаем значение
+            templateRingSize.value = '';
         }
-        // ✅ ВКЛЮЧАЕМ поле индивидуального размера
-        if (customRingSize) {
-            customRingSize.disabled = false;
-        }
+        if (customRingSize) customRingSize.disabled = false;
+
+        // Показываем поле бюджета при индивидуальном заказе
+        if (budgetGroup) budgetGroup.style.display = 'block';
+
     } else {
-        // Если тип заказа не выбран, отключаем оба поля
+        // Если тип заказа не выбран, отключаем оба поля размера и скрываем бюджет
         if (templateRingSize) templateRingSize.disabled = true;
         if (customRingSize) customRingSize.disabled = true;
+        if (budgetGroup) budgetGroup.style.display = 'none';
     }
 }
 
@@ -761,12 +769,16 @@ function validateForm() {
     }
     
     // Валидация: Бюджет
-    if (!budget || !budget.value || parseFloat(budget.value) <= 0) {
-        showError(budget, 'Укажите бюджет (больше 0)');
-        errors.push('Бюджет обязателен и должен быть больше 0');
-        isValid = false;
+    if (orderType && orderType.value === 'custom') {
+        if (!budget || !budget.value || parseFloat(budget.value) <= 0) {
+            showError(budget, 'Укажите бюджет (больше 0)');
+            errors.push('Бюджет обязателен и должен быть больше 0');
+            isValid = false;
+        } else {
+            clearError(budget);
+        }
     } else {
-        clearError(budget);
+        clearError(budget); // Для шаблонных заказов убираем ошибку, если была
     }
     
     // Валидация: Дата готовности

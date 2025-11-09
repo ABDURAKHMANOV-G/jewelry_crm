@@ -22,4 +22,6 @@ urlpatterns = [
     
     path('order/<int:pk>/generate-brief/', views.generate_modeler_brief, name='generate_modeler_brief'),
     path('collection-order/<int:product_id>/', views.collection_order_create, name='collection_order_create'),
+    
+    path('orders/export-csv/', views.export_orders_csv, name='export_orders_csv')
 ]

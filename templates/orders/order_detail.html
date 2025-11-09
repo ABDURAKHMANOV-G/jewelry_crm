@@ -45,7 +45,7 @@
                 </a>
                 {% endif %}
 
-                {% if user.role == 'manager' or user.role == 'client' and order.order_status == 'new' %}
+                {% if user.role == 'manager' and order.order_status == 'new' %}
                 <a href="{% url 'order_delete' order.order_id %}" 
                    class="btn-action btn-delete"
                    onclick="return confirm('Вы уверены что хотите удалить этот заказ?')">
