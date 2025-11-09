@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}О нас - JEWEllUX{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <h1>О НАС</h1>
+            <div class="gold-divider"></div>
+            <p>Мы создаём не просто украшения — мы создаём произведения искусства, которые передаются из поколения в поколение</p>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <section class="story-section">
+        <div class="story-container">
+            <div class="story-image">💎</div>
+            <div class="story-content">
+                <h2>Наша история</h2>
+                <div class="gold-divider" style="margin-left: 0;"></div>
+                <p>
+                    Основанный в <span class="highlight-text">1987 году</span>, JEWEllUX родился из страсти к созданию уникальных ювелирных изделий высочайшего качества. 
+                </p>
+                <p>
+                    За более чем <span class="highlight-text">35 лет</span> работы мы завоевали доверие самых взыскательных клиентов, создавая украшения, которые становятся семейными реликвиями.
+                </p>
+                <p>
+                    Каждое изделие JEWEllUX — это результат безупречного мастерства, передаваемого из поколения в поколение, и стремления к совершенству в каждой детали.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="values-container">
+            <h2>Наши ценности</h2>
+            <div class="gold-divider"></div>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">💎</div>
+                    <h3>Качество</h3>
+                    <p>Мы используем только натуральные драгоценные камни высшей категории с сертификатами GIA и Gübelin.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">✨</div>
+                    <h3>Мастерство</h3>
+                    <p>Каждое украшение создаётся вручную мастерами с многолетним опытом.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🏆</div>
+                    <h3>Эксклюзивность</h3>
+                    <p>Уникальные авторские дизайны и лимитированные коллекции.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workshop Section -->
+    <section class="workshop-section">
+        <div class="workshop-container">
+            <div class="workshop-content">
+                <h2>Наша мастерская</h2>
+                <div class="gold-divider" style="margin-left: 0;"></div>
+                <p>
+                    В сердце нашего ателье работают мастера-ювелиры высшей квалификации, каждый из которых посвятил искусству создания украшений десятилетия жизни.
+                </p>
+                <p>
+                    Мы сочетаем вековые традиции ювелирного дела с современными технологиями, что позволяет создавать изделия непревзойдённого качества.
+                </p>
+                <div class="workshop-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">35+</span>
+                        <span class="stat-label">Лет опыта</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">15</span>
+                        <span class="stat-label">Мастеров</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5000+</span>
+                        <span class="stat-label">Довольных клиентов</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Ручная работа</span>
+                    </div>
+                </div>
+            </div>
+            <div class="story-image">⚒️</div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Готовы создать своё уникальное украшение?</h2>
+            <div class="gold-divider"></div>
+            <p>Посетите нашу коллекцию или свяжитесь с нами для индивидуальной консультации</p>
+            <a href="{% url 'collection' %}" class="btn-cta">Посмотреть коллекцию</a>
+            <a href="{% url 'contact' %}" class="btn-cta btn-cta-outline">Связаться с нами</a>
+        </div>
+    </section>
+{% endblock %}

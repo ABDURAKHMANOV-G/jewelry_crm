@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Связаться с нами - JEWEllUX{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Contact Hero -->
+    <section class="contact-hero">
+        <div class="contact-hero-content">
+            <h1>Связаться с нами</h1>
+            <div class="gold-divider"></div>
+            <p>Мы всегда готовы проконсультировать вас по любым вопросам и подобрать идеальное украшение для любого события.</p>
+        </div>
+    </section>
+
+    <!-- Contact Info & Form -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <!-- Контактная информация -->
+            <div class="contact-info">
+                <div class="info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <div>
+                        <div class="info-label">Бутик JEWEllUX</div>
+                        <div>г. Москва, Большая Никитская 25, стр. 2</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-telephone"></i>
+                    <div>
+                        <div class="info-label">Телефон</div>
+                        <a href="tel:+79990001122">+7 (999) 000-11-22</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-envelope"></i>
+                    <div>
+                        <div class="info-label">Email</div>
+                        <a href="mailto:info@jewellux.ru">info@jewellux.ru</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-clock"></i>
+                    <div>
+                        <div class="info-label">Часы работы</div>
+                        <div>Пн-Пт: 10:00–20:00, Сб-Вс: 11:00–18:00</div>
+                    </div>
+                </div>
+                <div class="info-socials">
+                    <a href="#" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                    <a href="#" title="Telegram"><i class="bi bi-telegram"></i></a>
+                    <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Форма обратной связи -->
+            <div class="contact-form-block">
+                <form method="POST" class="contact-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_name">Ваше имя</label>
+                        <input type="text" id="id_name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_phone">Телефон</label>
+                        <input type="tel" id="id_phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        <input type="email" id="id_email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_topic">Тема обращения</label>
+                        <select id="id_topic" name="topic" required>
+                            <option value="question">Вопрос</option>
+                            <option value="consultation">Консультация</option>
+                            <option value="order">Заказ украшения</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_message">Ваше сообщение</label>
+                        <textarea id="id_message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-contact">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map -->
+    <section class="contact-map-section">
+        <div class="map-container">
+            <iframe src="https://yandex.ru/map-widget/v1/-/CCUBBFu7HC" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="contact-faq-section">
+        <div class="faq-container">
+            <h2>Популярные вопросы</h2>
+            <div class="gold-divider"></div>
+            <div class="faq-list">
+                <div class="faq-item"><b>Могу ли я создать украшение по собственному эскизу?</b> — Да, наши мастера реализуют ваши самые смелые идеи!</div>
+                <div class="faq-item"><b>Есть ли доставка?</b> — Бесплатная доставка по Москве и всей России.</div>
+                <div class="faq-item"><b>Можно ли посмотреть изделие вживую?</b> — Конечно, запишитесь на просмотр по телефону или через сайт.</div>
+                <div class="faq-item"><b>Как узнать стоимость уникального изделия?</b> — Оставьте заявку, менеджер свяжется для индивидуального расчёта.</div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

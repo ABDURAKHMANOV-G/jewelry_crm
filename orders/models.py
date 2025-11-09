@@ -139,6 +139,7 @@ class Document(models.Model):
     
     DOCUMENT_TYPE_CHOICES = [
         ('invoice', 'Счёт на оплату'),
+        ('receipt', 'Чек'),
         ('act', 'Акт оказания услуг'),
         ('contract', 'Договор на изготовление изделия'),
     ]

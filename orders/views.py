@@ -10,7 +10,7 @@ from accounts.decorators import client_required, manager_required
 from .models import Document
 from .forms import DocumentCreateForm, DocumentUpdateForm
 from datetime import datetime
-from .document_generator import generate_invoice_pdf, generate_act_pdf, generate_contract_pdf
+from .document_generator import generate_invoice_pdf, generate_act_pdf, generate_contract_pdf, generate_receipt_pdf
 from django.http import FileResponse
 from .reports import generate_report_data, generate_report_pdf
 from datetime import datetime, timedelta
@@ -19,6 +19,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import CollectionOrderForm
 from accounts.models import Customer  # ← Исправленный импорт
+
+
 
 # ========================================
 # ФУНКЦИЯ РАСЧЕТА ЦЕНЫ ЗАКАЗА
@@ -467,6 +469,9 @@ def document_export_pdf(request, pk):
     elif document.document_type == 'contract':
         pdf_buffer = generate_contract_pdf(order, document)
         filename = f"Договор_{document.document_number}.pdf"
+    elif document.document_type == 'contract':
+        pdf_buffer = generate_receipt_pdf(order, document)
+        filename = f"Чек_{document.document_number}.pdf"
     else:
         filename = f"Документ_{document.document_number}.pdf"
         pdf_buffer = generate_invoice_pdf(order, document)

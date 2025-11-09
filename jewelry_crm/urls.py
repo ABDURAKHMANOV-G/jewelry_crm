@@ -19,4 +19,6 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     
     path('catalog/', include('catalog.urls')),
+    
+    path('', include('pages.urls')),
 ]

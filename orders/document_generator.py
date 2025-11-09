@@ -561,6 +561,111 @@ def generate_contract_pdf(order, document):
     buffer.seek(0)
     return buffer
 
+def generate_receipt_pdf(order, document):
+    """Генерирует чек (receipt) для заказа"""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, 
+                            rightMargin=20*mm, leftMargin=20*mm, 
+                            topMargin=15*mm, bottomMargin=15*mm)
+    
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Стили
+    normal_style = ParagraphStyle('CustomNormal',
+        parent=styles['Normal'],
+        fontName=FONT_NAME,
+        fontSize=10,
+        leading=13
+    )
+    bold_style = ParagraphStyle('CustomBold',
+        parent=styles['Normal'],
+        fontName=FONT_NAME_BOLD,
+        fontSize=10,
+        leading=13
+    )
+    center_style = ParagraphStyle('CenterBold',
+        parent=bold_style,
+        alignment=1,
+        spaceAfter=10
+    )
+
+    # === ЗАГОЛОВОК ===
+    elements.append(Paragraph("КАССОВЫЙ ЧЕК", center_style))
+    elements.append(Paragraph(f"№ {document.document_number} от {document.document_date.strftime('%d.%m.%Y')}", center_style))
+    elements.append(Spacer(1, 5*mm))
+
+    # === ИНФОРМАЦИЯ О КОМПАНИИ ===
+    elements.append(Paragraph(f"<b>{COMPANY_NAME}</b>", bold_style))
+    elements.append(Paragraph(f"ИНН {COMPANY_INN}, КПП {COMPANY_KPP}", normal_style))
+    elements.append(Paragraph(COMPANY_ADDRESS, normal_style))
+    elements.append(Paragraph(f"Телефон: {COMPANY_PHONE}", normal_style))
+    elements.append(Spacer(1, 5*mm))
+
+    # === ИНФОРМАЦИЯ О ПОКУПАТЕЛЕ ===
+    elements.append(Paragraph(f"Покупатель: {order.customer.name} {order.customer.surname}", normal_style))
+    elements.append(Paragraph(f"Телефон: {order.customer.phone}", normal_style))
+    elements.append(Spacer(1, 5*mm))
+
+    # === СУТЬ ОПЕРАЦИИ ===
+    product_name = {
+        'ring': 'Кольцо',
+        'brooch': 'Брошь',
+        'bracelet': 'Браслет',
+        'earrings': 'Серьги'
+    }.get(getattr(order, 'product_type', None), 'Ювелирное изделие')
+
+    order_type = getattr(order, 'order_type', None)
+    order_type_display = {
+        'template': 'по шаблону',
+        'custom': 'индивидуальное'
+    }.get(order_type, '')
+    service_name = f"{product_name} {order_type_display}".strip()
+
+    price = order.budget or 0
+
+    items_data = [
+        [Paragraph('<b>Наименование</b>', bold_style), Paragraph('<b>Количество</b>', bold_style),
+         Paragraph('<b>Цена</b>', bold_style), Paragraph('<b>Сумма</b>', bold_style)],
+        [Paragraph(service_name, normal_style), Paragraph('1', normal_style),
+         Paragraph(f'{price:.2f}', normal_style), Paragraph(f'{price:.2f}', normal_style)]
+    ]
+    items_table = Table(items_data, colWidths=[85*mm, 20*mm, 35*mm, 35*mm])
+    items_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), FONT_NAME),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+    ]))
+    elements.append(items_table)
+    elements.append(Spacer(1, 5*mm))
+
+    # === ИТОГО ===
+    elements.append(Paragraph(f"<b>Итого к оплате:</b> {price:.2f} руб.", bold_style))
+    rubles = int(price)
+    kopeks = int((price - rubles) * 100)
+    amount_words = num_to_words_ru(rubles).capitalize()
+    elements.append(Paragraph(f"{amount_words} рублей {kopeks:02d} копеек", normal_style))
+    elements.append(Spacer(1, 5*mm))
+
+    # === СПОСОБ ОПЛАТЫ ===
+    elements.append(Paragraph("Способ оплаты: наличные/безналичная оплата", normal_style))
+
+    # === ДАТА, КАССИР ===
+    elements.append(Spacer(1, 10*mm))
+    elements.append(Paragraph(f"Кассир: __________________   Дата: {datetime.now().strftime('%d.%m.%Y')}", normal_style))
+
+    elements.append(Spacer(1, 10*mm))
+    elements.append(Paragraph("<b>Спасибо за покупку!</b>", center_style))
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+
 def generate_brief_pdf(order):
     """
     Генерирует ТЗ (техническое задание) для модельера в PDF

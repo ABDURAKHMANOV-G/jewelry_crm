@@ -314,6 +314,7 @@ class DocumentCreateForm(forms.ModelForm):
     document_type = forms.ChoiceField(
         choices=[
             ('invoice', 'Счёт на оплату'),
+            ('receipt', 'Чек'),
             ('act', 'Акт оказания услуг'),
             ('contract', 'Договор на изготовление изделия'),
         ],

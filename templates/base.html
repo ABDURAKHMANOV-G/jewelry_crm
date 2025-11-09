@@ -38,8 +38,8 @@
                     <ul class="nav-menu justify-content-center">
                         <li><a href="{% url 'home' %}">ГЛАВНАЯ</a></li>
                         <li><a href="{% url 'collection' %}">НОВАЯ КОЛЛЕКЦИЯ</a></li>
-                        <li><a href="#about">О НАС</a></li>
-                        <li><a href="#contact">СВЯЗАТЬСЯ</a></li>
+                        <li><a href="{% url 'about' %}">О НАС</a></li>
+                        <li><a href="{% url 'contact' %}">СВЯЗАТЬСЯ</a></li>
                         
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'order_list' %}">МОИ ЗАКАЗЫ</a></li>

@@ -1,0 +1,236 @@
+.about-hero {
+    min-height: 60vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 20px;
+    position: relative;
+}
+.about-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+}
+.about-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: #d4af37;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+.about-hero p {
+    font-size: 22px;
+    line-height: 1.8;
+    color: #cccccc;
+    font-weight: 300;
+}
+.gold-divider {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    margin: 30px auto;
+}
+.story-section {
+    padding: 120px 0;
+    background: #0d0d0d;
+}
+.story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 50px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+.story-image {
+    width: 100%;
+    height: 500px;
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    color: rgba(212, 175, 55, 0.3);
+}
+.story-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: #d4af37;
+    margin-bottom: 30px;
+}
+.story-content p {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #cccccc;
+    margin-bottom: 20px;
+}
+.highlight-text {
+    color: #d4af37;
+    font-weight: 600;
+}
+.values-section {
+    padding: 120px 0;
+    background: #1a1a1a;
+}
+.values-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 50px;
+    text-align: center;
+}
+.values-container h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: #d4af37;
+    margin-bottom: 20px;
+}
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+}
+.value-card {
+    padding: 50px 30px;
+    background: rgba(212, 175, 55, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+.value-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.value-icon {
+    font-size: 64px;
+    margin-bottom: 25px;
+}
+.value-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+.value-card p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #cccccc;
+}
+.workshop-section {
+    padding: 120px 0;
+    background: #0d0d0d;
+}
+.workshop-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 50px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+.workshop-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: #d4af37;
+    margin-bottom: 30px;
+}
+.workshop-content p {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #cccccc;
+    margin-bottom: 20px;
+}
+.workshop-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+.stat-item {
+    text-align: center;
+    padding: 30px;
+    background: rgba(212, 175, 55, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+}
+.stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    color: #d4af37;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+}
+.stat-label {
+    font-size: 14px;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.cta-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+    text-align: center;
+}
+.cta-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+.cta-content p {
+    font-size: 18px;
+    color: #cccccc;
+    margin-bottom: 40px;
+}
+.btn-cta {
+    display: inline-block;
+    padding: 18px 45px;
+    background: linear-gradient(135deg, #d4af37, #c9a647);
+    color: #1a1a1a;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+.btn-cta-outline {
+    background: transparent;
+    color: #d4af37;
+    border: 2px solid #d4af37;
+    margin-left: 20px;
+}
+.btn-cta:hover, .btn-cta-outline:hover {
+    background: linear-gradient(135deg, #c9a647, #b89635);
+    color: #181818;
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+}
+@media (max-width: 768px) {
+    .about-hero h1 {
+        font-size: 42px;
+    }
+    .story-container,
+    .workshop-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+    .workshop-stats {
+        grid-template-columns: 1fr;
+    }
+}
