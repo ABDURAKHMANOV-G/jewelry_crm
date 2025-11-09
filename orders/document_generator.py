@@ -210,7 +210,7 @@ def generate_invoice_pdf(order, document):
     }.get(order.order_type, '')
     
     service_name = f"Изготовление {product_name} {order_type_name}".strip()
-    price = order.budget or 0
+    price = document.amount if document.amount is not None else (order.final_price or order.budget or 0)
     
     services_data = [
         [Paragraph('<b>№</b>', bold_style), 
@@ -339,7 +339,7 @@ def generate_act_pdf(order, document):
     }.get(order.order_type, '')
     
     service_name = f"Изготовление {product_name} {order_type_name}".strip()
-    price = order.budget or 0
+    price = document.amount if document.amount is not None else (order.final_price or order.budget or 0)
     
     services_data = [
         [Paragraph('<b>№</b>', bold_style), 
@@ -432,6 +432,7 @@ def generate_contract_pdf(order, document):
     
     elements = []
     styles = getSampleStyleSheet()
+    price = document.amount if document.amount is not None else (order.final_price or order.budget or 0)
     
     # Стили
     normal_style = ParagraphStyle('CustomNormal', parent=styles['Normal'],
@@ -484,8 +485,8 @@ def generate_contract_pdf(order, document):
         subject_text += f"&nbsp;&nbsp;&nbsp;- Размер: {order.ring_size}<br/>"
     
     subject_text += f"""
-    1.3. Стоимость работ по изготовлению Изделия составляет <b>{order.budget or 0:.2f} (
-    {num_to_words_ru(int(order.budget or 0))} рублей 00 копеек)</b>.
+    1.3. Стоимость работ по изготовлению Изделия составляет <b>{price or 0:.2f} (
+    {num_to_words_ru(int(price or 0))} рублей 00 копеек)</b>.
     """
     
     elements.append(Paragraph(subject_text, normal_style))
@@ -622,7 +623,7 @@ def generate_receipt_pdf(order, document):
     }.get(order_type, '')
     service_name = f"{product_name} {order_type_display}".strip()
 
-    price = order.budget or 0
+    price = document.amount if document.amount is not None else (order.final_price or order.budget or 0)
 
     items_data = [
         [Paragraph('<b>Наименование</b>', bold_style), Paragraph('<b>Количество</b>', bold_style),
@@ -873,39 +874,6 @@ def generate_brief_pdf(order):
         story.append(Paragraph("<b>5. ПОЖЕЛАНИЯ КЛИЕНТА</b>", heading_style))
         story.append(Paragraph(order.comment, normal_style))
         story.append(Spacer(1, 8*mm))
-    
-    # ========================================
-    # ФИНАНСОВАЯ ИНФОРМАЦИЯ
-    # ========================================
-    story.append(Paragraph("<b>6. ФИНАНСОВАЯ ИНФОРМАЦИЯ</b>", heading_style))
-    
-    finance_data = []
-    
-    if order.budget:
-        finance_data.append(['Бюджет клиента:', f"{order.budget:,.0f} руб."])
-    
-    if order.estimated_price:
-        finance_data.append(['Предложенная цена:', f"{order.estimated_price:,.0f} руб."])
-    
-    if order.final_price:
-        finance_data.append(['Утвержденная цена:', f"{order.final_price:,.0f} руб."])
-    
-    if finance_data:
-        finance_table = Table(finance_data, colWidths=[60*mm, 110*mm])
-        finance_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f5f5f5')),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), FONT_NAME_BOLD),
-            ('FONTNAME', (1, 0), (1, -1), FONT_NAME),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ]))
-        story.append(finance_table)
-    
-    story.append(Spacer(1, 15*mm))
     
     # ========================================
     # ПОДПИСЬ
