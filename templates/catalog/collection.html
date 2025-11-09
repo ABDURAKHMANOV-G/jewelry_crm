@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Новая Коллекция 2025 - JEWEllUX{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/collection.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="collection-hero">
+        <div class="hero-content">
+            <h1>НОВАЯ КОЛЛЕКЦИЯ</h1>
+            <div class="gold-divider"></div>
+            <p class="hero-tagline">Воплощение элегантности и изысканности</p>
+            <p class="hero-season">Сезон Весна-Лето 2025</p>
+        </div>
+    </section>
+
+    <!-- Collection Section -->
+    <section class="collection-section">
+        <div class="collection-container">
+            <div class="collection-header">
+                <h2>КОЛЛЕКЦИЯ LUMIÈRE</h2>
+                <div class="gold-divider"></div>
+                <p>Вдохновленная игрой света и тени, коллекция Lumière воплощает изысканность в каждой детали. Каждое украшение — это симфония мастерства, созданная для тех, кто ценит настоящее искусство ювелирного дела.</p>
+            </div>
+
+            <div class="collection-grid">
+                <!-- Item 1 - Étoile -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/etoile.jpg' %}" alt="Кольцо Étoile" class="product-image">
+                        <span class="item-number">01</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Кольцо</div>
+                        <h3 class="item-name">Étoile</h3>
+                        <p class="item-description">Платина 950 пробы, бриллианты 1.2 ct, ручная огранка</p>
+                        <div class="item-price"><span>от</span> 385 000 ₽</div>
+                        <a href="{% url 'product_detail' 1 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 2 - Aurora -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/aurora.jpg' %}" alt="Серьги Aurora" class="product-image">
+                        <span class="item-number">02</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Серьги</div>
+                        <h3 class="item-name">Aurora</h3>
+                        <p class="item-description">Белое золото 750, изумруды Колумбии, бриллианты</p>
+                        <div class="item-price"><span>от</span> 520 000 ₽</div>
+                        <a href="{% url 'product_detail' 2 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 3 - Céleste -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/celeste.jpg' %}" alt="Колье Céleste" class="product-image">
+                        <span class="item-number">03</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Колье</div>
+                        <h3 class="item-name">Céleste</h3>
+                        <p class="item-description">Белое золото 750, сапфиры Кашмира, бриллианты</p>
+                        <div class="item-price"><span>от</span> 1 250 000 ₽</div>
+                        <a href="{% url 'product_detail' 3 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 4 - Harmonie -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/harmonie.jpg' %}" alt="Браслет Harmonie" class="product-image">
+                        <span class="item-number">04</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Браслет</div>
+                        <h3 class="item-name">Harmonie</h3>
+                        <p class="item-description">Розовое золото 585, бриллианты, ручная работа</p>
+                        <div class="item-price"><span>от</span> 245 000 ₽</div>
+                        <a href="{% url 'product_detail' 4 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 5 - Lumière -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/lumiere.jpg' %}" alt="Подвеска Lumière" class="product-image">
+                        <span class="item-number">05</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Подвеска</div>
+                        <h3 class="item-name">Lumière</h3>
+                        <p class="item-description">Белое золото 750, центральный бриллиант 0.8 ct</p>
+                        <div class="item-price"><span>от</span> 195 000 ₽</div>
+                        <a href="{% url 'product_detail' 5 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Item 6 - Impérial -->
+                <div class="collection-item">
+                    <div class="item-image">
+                        <img src="{% static 'images/collection/imperial.jpg' %}" alt="Кольцо Impérial" class="product-image">
+                        <span class="item-number">06</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-category">Кольцо</div>
+                        <h3 class="item-name">Impérial</h3>
+                        <p class="item-description">Платина 950, бирманский рубин 2.5 ct, бриллианты</p>
+                        <div class="item-price"><span>от</span> 890 000 ₽</div>
+                        <a href="{% url 'product_detail' 6 %}" class="btn-view-item">
+                            <i class="bi bi-eye"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Item -->
+    <section class="featured-section">
+        <div class="featured-container">
+            <div class="featured-image">
+                <img src="{% static 'images/collection/featured/celeste-featured.jpg' %}" alt="Колье Céleste" class="featured-product-image">
+            </div>
+            <div class="featured-content">
+                <h2>ШЕДЕВР КОЛЛЕКЦИИ</h2>
+                <div class="gold-divider" style="margin-left: 0;"></div>
+                <p>Колье «Céleste» — венец коллекции Lumière, созданное в единственном экземпляре. Это произведение искусства требует более 300 часов кропотливой ручной работы мастеров высшей квалификации.</p>
+                <p>Каждый из 127 бриллиантов огранки «маркиз» отбирается индивидуально для достижения идеальной симметрии и игры света.</p>
+                
+                <div class="featured-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Материал</span>
+                        <span class="spec-value">Белое золото 750 пробы</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Драгоценные камни</span>
+                        <span class="spec-value">Сапфир 15 ct, бриллианты 12.7 ct</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Время изготовления</span>
+                        <span class="spec-value">300+ часов ручной работы</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Стоимость</span>
+                        <span class="spec-value">По запросу</span>
+                    </div>
+                </div>
+                
+                <a href="{% url 'product_detail' 3 %}" class="btn-featured">
+                    <i class="bi bi-eye"></i>
+                    Подробнее о шедевре
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Craftsmanship -->
+    <section class="craftsmanship-section">
+        <h2>ИСКУССТВО СОВЕРШЕНСТВА</h2>
+        <div class="gold-divider"></div>
+        <p class="craftsmanship-subtitle">Каждое изделие JEWEllUX — результат безупречного мастерства, передаваемого из поколения в поколение</p>
+
+        <div class="features-grid">
+            <div class="feature">
+                <span class="feature-icon">💎</span>
+                <h3 class="feature-title">Редкие камни</h3>
+                <p class="feature-text">Только натуральные драгоценные камни высшей категории с сертификатами GIA</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">✨</span>
+                <h3 class="feature-title">Ручная работа</h3>
+                <p class="feature-text">Каждое украшение создается вручную мастерами с многолетним опытом</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">🎨</span>
+                <h3 class="feature-title">Эксклюзивный дизайн</h3>
+                <p class="feature-text">Уникальные авторские решения и возможность индивидуального заказа</p>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">🏆</span>
+                <h3 class="feature-title">Пожизненная гарантия</h3>
+                <p class="feature-text">Сертификат подлинности и полное сервисное обслуживание без ограничений</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/collection.js' %}"></script>
+{% endblock %}

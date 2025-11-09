@@ -44,6 +44,7 @@ class Order(models.Model):
     ORDER_TYPE_CHOICES = [
         ('template', 'Шаблонный'),
         ('custom', 'Индивидуальный'),
+        ('collection', 'Заказ из коллекции'),
     ]
     order_type = models.CharField(max_length=20, choices=ORDER_TYPE_CHOICES, null=True, blank=True, verbose_name='Тип заказа')
     
@@ -83,6 +84,11 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Поля для заказов из коллекции
+    collection_product_id = models.IntegerField(null=True, blank=True, verbose_name='ID товара из коллекции')
+    collection_product_name = models.CharField(max_length=200, null=True, blank=True, verbose_name='Название товара')
+    collection_product_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Цена из коллекции')
+    
     class Meta:
         managed = False
         db_table = 'orders'

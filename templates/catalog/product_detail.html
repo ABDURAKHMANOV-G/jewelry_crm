@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - {{ product.category }} - JEWEllUX{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Product Hero -->
+    <section class="product-hero">
+        <div class="container">
+            <a href="{% url 'collection' %}" class="back-link">
+                <i class="bi bi-arrow-left"></i>
+                Вернуться к коллекции
+            </a>
+        </div>
+    </section>
+
+    <!-- Product Main -->
+    <section class="product-main">
+        <div class="container">
+            <div class="product-grid">
+                <!-- Left Column - Gallery -->
+                <div class="product-gallery">
+                    <div class="main-image">
+                        <img src="{% static 'images/collection/' %}{{ product.image_name }}.jpg" 
+                            alt="{{ product.name }}" 
+                            class="product-main-image">
+                    </div>
+                    <div class="thumbnail-grid">
+                        <div class="thumbnail active">
+                            <img src="{% static 'images/collection/' %}{{ product.image_name }}.jpg" 
+                                alt="{{ product.name }}">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="{% static 'images/collection/' %}{{ product.image_name }}.jpg" 
+                                alt="{{ product.name }}">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="{% static 'images/collection/' %}{{ product.image_name }}.jpg" 
+                                alt="{{ product.name }}">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="{% static 'images/collection/' %}{{ product.image_name }}.jpg" 
+                                alt="{{ product.name }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Info -->
+                <div class="product-info">
+                    <div class="product-badge">{{ product.category }}</div>
+                    <h1 class="product-title">{{ product.name }}</h1>
+                    <p class="product-tagline">{{ product.tagline }}</p>
+                    
+                    <div class="gold-divider"></div>
+                    
+                    <div class="product-price">
+                        <span class="price-label">от</span>
+                        <span class="price-value">{{ product.price|floatformat:0 }} ₽</span>
+                    </div>
+
+                    <div class="product-actions">
+                        {% if user.is_authenticated %}
+                            {% if user.role == 'client' %}
+                                <a href="{% url 'collection_order_create' product.id %}" class="btn-primary">
+                                    <i class="bi bi-cart-plus"></i>
+                                    Заказать изделие
+                                </a>
+                            {% else %}
+                                <button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                    <i class="bi bi-lock"></i>
+                                    Доступно только клиентам
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Войти для заказа
+                            </a>
+                        {% endif %}
+                        
+                        <button class="btn-secondary">
+                            <i class="bi bi-calendar-check"></i>
+                            Записаться на просмотр
+                        </button>
+                    </div>
+
+                    <div class="trust-badges">
+                        <div class="badge-item">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Сертификат подлинности</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="bi bi-truck"></i>
+                            <span>Бесплатная доставка</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            <span>30 дней на возврат</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Description -->
+    <section class="product-description">
+        <div class="container-narrow">
+            <h2 class="section-title">О произведении</h2>
+            <div class="gold-divider"></div>
+            <p class="lead-text">{{ product.main_description }}</p>
+            
+            <div class="story-block">
+                <h3>История создания</h3>
+                <p>{{ product.story }}</p>
+            </div>
+
+            <div class="craftsmanship-block">
+                <h3>Мастерство исполнения</h3>
+                <p>{{ product.craftsmanship }}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specifications -->
+    <section class="product-specs">
+        <div class="container-narrow">
+            <h2 class="section-title">Технические характеристики</h2>
+            <div class="gold-divider"></div>
+            
+            <div class="specs-grid">
+                <div class="specs-card">
+                    <h4>Материалы</h4>
+                    <table class="specs-table">
+                        {% for material in product.materials %}
+                        <tr>
+                            <td class="spec-label">{{ material.name }}</td>
+                            <td class="spec-value">{{ material.value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="specs-card">
+                    <h4>Характеристики</h4>
+                    <table class="specs-table">
+                        {% for spec in product.specifications %}
+                        <tr>
+                            <td class="spec-label">{{ spec.name }}</td>
+                            <td class="spec-value">{{ spec.value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Care Instructions -->
+    <section class="product-care">
+        <div class="container-narrow">
+            <h2 class="section-title">Уход и обслуживание</h2>
+            <div class="gold-divider"></div>
+            
+            <div class="care-grid">
+                {% for instruction in product.care %}
+                <div class="care-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <p>{{ instruction }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="product-cta">
+        <div class="container-narrow">
+            <div class="cta-card">
+                <h2>Готовы приобрести {{ product.name }}?</h2>
+                <p>Наши консультанты ответят на все вопросы и помогут оформить заказ</p>
+                <div class="cta-actions">
+                    <a href="{% url 'order_create' %}" class="btn-primary-large">
+                        <i class="bi bi-gem"></i>
+                        Заказать изделие
+                    </a>
+                    <a href="tel:+79999999999" class="btn-outline-large">
+                        <i class="bi bi-telephone"></i>
+                        Позвонить нам
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/product_detail.js' %}"></script>
+{% endblock %}

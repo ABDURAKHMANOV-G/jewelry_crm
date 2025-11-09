@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заказать {{ product.name }} - JEWEllUX{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/collection_order.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="collection-order-section">
+    <div class="container-narrow">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{% url 'collection' %}">Коллекция</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>Оформление заказа</span>
+        </div>
+
+        <!-- Order Header -->
+        <div class="order-header">
+            <h1 class="order-title">Оформление заказа</h1>
+            <div class="gold-divider"></div>
+        </div>
+
+        <div class="order-grid">
+            <!-- Product Summary -->
+            <div class="product-summary-card">
+                <h3>Выбранное изделие</h3>
+                <div class="product-summary">
+                    <div class="summary-image">
+                        <span class="luxury-icon">◆</span>
+                    </div>
+                    <div class="summary-info">
+                        <div class="summary-badge">{{ product.category }}</div>
+                        <h4>{{ product.name }}</h4>
+                        <p class="summary-tagline">{{ product.tagline }}</p>
+                        <div class="summary-materials">
+                            <i class="bi bi-gem"></i>
+                            {{ product.materials }}
+                        </div>
+                        <div class="summary-price">
+                            {{ product.price|floatformat:0 }} ₽
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="order-features">
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Сертификат подлинности</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-truck"></i>
+                        <span>Бесплатная доставка</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Изготовление 14-21 день</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Form -->
+            <div class="order-form-card">
+                <h3>Параметры заказа</h3>
+                <form method="post" id="collectionOrderForm">
+                    {% csrf_token %}
+                    
+                    <!-- Size Selection -->
+                    <div class="form-group">
+                        <label for="{{ form.ring_size.id_for_label }}">
+                            {{ form.ring_size.label }} <span class="required">*</span>
+                        </label>
+                        {{ form.ring_size }}
+                        {% if form.ring_size.errors %}
+                            <div class="error-message">{{ form.ring_size.errors.0 }}</div>
+                        {% endif %}
+                        <small class="form-hint">
+                            <i class="bi bi-info-circle"></i>
+                            Если вы не знаете свой размер, наш консультант поможет определить его при встрече
+                        </small>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="form-group">
+                        <label for="{{ form.comment.id_for_label }}">
+                            {{ form.comment.label }}
+                        </label>
+                        {{ form.comment }}
+                        <small class="form-hint">
+                            Укажите дополнительные пожелания или нестандартный размер
+                        </small>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-summary-box">
+                        <h4>Итого к оплате</h4>
+                        <div class="summary-row">
+                            <span>Стоимость изделия:</span>
+                            <span class="summary-value">{{ product.price|floatformat:0 }} ₽</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Доставка:</span>
+                            <span class="summary-value free">Бесплатно</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total">
+                            <span>Общая сумма:</span>
+                            <span class="summary-value">{{ product.price|floatformat:0 }} ₽</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-check-circle"></i>
+                            Оформить заказ
+                        </button>
+                        <a href="{% url 'product_detail' product.id %}" class="btn-cancel">
+                            <i class="bi bi-arrow-left"></i>
+                            Вернуться к товару
+                        </a>
+                    </div>
+
+                    <!-- Info Note -->
+                    <div class="info-note">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <p>После оформления заказа наш менеджер свяжется с вами для уточнения деталей и согласования сроков изготовления</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/collection_order.js' %}"></script>
+{% endblock %}

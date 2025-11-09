@@ -14,7 +14,11 @@ from .document_generator import generate_invoice_pdf, generate_act_pdf, generate
 from django.http import FileResponse
 from .reports import generate_report_data, generate_report_pdf
 from datetime import datetime, timedelta
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .forms import CollectionOrderForm
+from accounts.models import Customer  # ← Исправленный импорт
 
 # ========================================
 # ФУНКЦИЯ РАСЧЕТА ЦЕНЫ ЗАКАЗА
@@ -273,6 +277,140 @@ def document_list(request, order_id):
         'documents': documents
     })
 
+@login_required
+def collection_order_create(request, product_id):
+    """Создание заказа из коллекции - ТОЛЬКО ДЛЯ КЛИЕНТОВ"""
+    
+    # Проверка роли пользователя
+    if request.user.role != 'client':
+        messages.error(request, 'Только клиенты могут оформлять заказы из коллекции.')
+        return redirect('collection')
+    
+    # Данные товаров из коллекции
+    products = {
+        1: {
+            'id': 1, 
+            'name': 'Étoile', 
+            'category': 'ring',  # ← Английское название для БД
+            'category_display': 'Кольцо',
+            'price': 385000,
+            'materials': 'Платина 950, бриллианты 1.2 ct', 
+            'tagline': 'Где вечность встречается с элегантностью'
+        },
+        2: {
+            'id': 2, 
+            'name': 'Aurora', 
+            'category': 'earring',
+            'category_display': 'Серьги',
+            'price': 520000,
+            'materials': 'Белое золото 750, изумруды, бриллианты', 
+            'tagline': 'Танец изумрудного пламени'
+        },
+        3: {
+            'id': 3, 
+            'name': 'Céleste', 
+            'category': 'necklace',
+            'category_display': 'Колье',
+            'price': 1250000,
+            'materials': 'Белое золото 750, сапфир 15 ct', 
+            'tagline': 'Небесная симфония сапфиров'
+        },
+        4: {
+            'id': 4, 
+            'name': 'Harmonie', 
+            'category': 'bracelet',
+            'category_display': 'Браслет',
+            'price': 245000,
+            'materials': 'Розовое золото 585, бриллианты', 
+            'tagline': 'Ритм изящества'
+        },
+        5: {
+            'id': 5, 
+            'name': 'Lumière', 
+            'category': 'pendant',
+            'category_display': 'Подвеска',
+            'price': 195000,
+            'materials': 'Белое золото 750, бриллиант 0.8 ct', 
+            'tagline': 'Капля света'
+        },
+        6: {
+            'id': 6, 
+            'name': 'Impérial', 
+            'category': 'ring',
+            'category_display': 'Кольцо',
+            'price': 890000,
+            'materials': 'Платина 950, рубин 2.5 ct', 
+            'tagline': 'Царственное великолепие'
+        },
+    }
+    
+    product = products.get(product_id)
+    if not product:
+        messages.error(request, 'Товар не найден')
+        return redirect('collection')
+    
+    if request.method == 'POST':
+        form = CollectionOrderForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            
+            # Получаем или создаем Customer для текущего пользователя
+            from accounts.models import Customer
+            customer, created = Customer.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    'first_name': request.user.first_name or 'Клиент',
+                    'last_name': request.user.last_name or '',
+                    'phone': '',
+                    'email': request.user.email or ''
+                }
+            )
+            
+            # Заполняем основные поля заказа
+            order.customer = customer
+            order.order_type = 'collection'  # Тип заказа: "Предзаказ"
+            order.product_type = product['category']  # Тип изделия из словаря
+            
+            # Информация о товаре из коллекции
+            order.collection_product_id = product['id']
+            order.collection_product_name = product['name']
+            order.collection_product_price = product['price']
+            order.estimated_price = product['price']
+            order.material = product['materials']
+            
+            # Размер изделия (если указан)
+            ring_size = form.cleaned_data.get('ring_size')
+            if ring_size and ring_size != 'custom':
+                order.ring_size = ring_size
+            
+            # Комментарий
+            comment = form.cleaned_data.get('comment')
+            if comment:
+                order.comment = comment
+            
+            # Статус заказа
+            order.status = 'pending'
+            
+            try:
+                order.save()
+                messages.success(
+                    request, 
+                    f'✨ Заказ на "{product["name"]}" успешно оформлен! '
+                    f'Наш менеджер свяжется с вами в ближайшее время.'
+                )
+                return redirect('order_detail', pk=order.order_id)
+            except Exception as e:
+                messages.error(request, f'Ошибка при создании заказа: {str(e)}')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+    else:
+        form = CollectionOrderForm()
+    
+    context = {
+        'form': form,
+        'product': product,
+    }
+    return render(request, 'orders/collection_order_create.html', context)
 
 @manager_required
 def document_create(request, order_id):

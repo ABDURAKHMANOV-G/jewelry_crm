@@ -40,30 +40,68 @@
                     {% for order in orders %}
                     <tr>
                         <td><strong>#{{ order.order_id }}</strong></td>
+                        
+                        <!-- Тип изделия -->
                         <td>
                             <span class="product-type">
-                                {% if order.product_type == 'ring' %}💍 Кольцо
-                                {% elif order.product_type == 'brooch' %}🌸 Брошь
-                                {% elif order.product_type == 'bracelet' %}📿 Браслет
-                                {% elif order.product_type == 'earrings' %}💎 Серьги
-                                {% else %}-{% endif %}
+                                {% if order.order_type == 'collection' %}
+                                    ⭐ Эксклюзив
+                                {% elif order.product_type == 'ring' %}
+                                    💍 Кольцо
+                                {% elif order.product_type == 'brooch' %}
+                                    🌸 Брошь
+                                {% elif order.product_type == 'bracelet' %}
+                                    📿 Браслет
+                                {% elif order.product_type == 'earring' or order.product_type == 'earrings' %}
+                                    💎 Серьги
+                                {% elif order.product_type == 'necklace' %}
+                                    💎 Колье
+                                {% elif order.product_type == 'pendant' %}
+                                    💠 Подвеска
+                                {% else %}
+                                    -
+                                {% endif %}
                             </span>
                         </td>
+                        
+                        <!-- Тип заказа -->
                         <td>
                             {% if order.order_type == 'template' %}
                                 <span class="order-type template">📋 Шаблонный</span>
                             {% elif order.order_type == 'custom' %}
                                 <span class="order-type custom">✏️ Индивидуальный</span>
-                            {% else %}-{% endif %}
+                            {% elif order.order_type == 'collection' %}
+                                <span class="order-type collection">🛍️ Предзаказ</span>
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
+                        
                         <td>{{ order.customer.name }} {{ order.customer.surname }}</td>
+                        
                         <td>
                             <span class="status-badge status-{{ order.order_status }}">
                                 {{ order.get_status_display_ru }}
                             </span>
                         </td>
-                        <td class="budget">{{ order.budget|default:"-" }} ₽</td>
+                        
+                        <!-- Бюджет / Цена -->
+                        <td class="budget">
+                            {% if order.order_type == 'collection' %}
+                                {% if order.collection_product_price %}
+                                    <span style="color: #d4af37; font-weight: 500;">{{ order.collection_product_price|floatformat:0 }} ₽</span>
+                                {% elif order.estimated_price %}
+                                    <span style="color: #d4af37; font-weight: 500;">{{ order.estimated_price|floatformat:0 }} ₽</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% else %}
+                                {{ order.budget|default:"-" }} ₽
+                            {% endif %}
+                        </td>
+                        
                         <td class="date">{{ order.created_at|date:"d.m.Y" }}</td>
+                        
                         <td>
                             <a href="{% url 'order_detail' order.order_id %}" class="btn-view">
                                 Открыть

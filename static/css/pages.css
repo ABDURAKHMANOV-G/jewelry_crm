@@ -1,3 +1,45 @@
+/* 
+   PAGES.CSS - TYPOGRAPHY
+   ======================
+*/
+
+/* Применяем Cormorant Garamond для всех заголовков */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif !important;
+}
+
+/* Специфичные классы заголовков */
+.orders-title,
+.detail-title,
+.customers-title,
+.customer-detail-name,
+.documents-title,
+.document-title,
+.create-title,
+.auth-title,
+.report-form-title,
+.report-header-title,
+.report-data-title,
+.doc-header-title,
+.doc-update-header-title,
+.delete-title,
+.product-title,
+.section-title,
+.collection-header h2,
+.featured-content h2,
+.craftsmanship-section h2,
+.cta-card h2 {
+    font-family: 'Cormorant Garamond', serif !important;
+}
+
+/* Названия товаров и карточек */
+.item-name,
+.product-name,
+.customer-name,
+.template-name {
+    font-family: 'Cormorant Garamond', serif !important;
+}
+
 /* ==========================================
    PAGES.CSS - СТИЛИ ВНУТРЕННИХ СТРАНИЦ
    ==========================================
@@ -243,12 +285,14 @@ select.form-control:focus {
 }
 
 .hero-content h1 {
+    font-family: 'Cormorant Garamond', serif !important;
     font-size: 42px;
-    font-weight: 700;
+    font-weight: 400; /* Вместо 700 */
     line-height: 1.2;
     margin-bottom: 20px;
     color: #ffffff;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    letter-spacing: 3px;
 }
 
 .hero-content p {
@@ -269,11 +313,13 @@ select.form-control:focus {
 }
 
 .portfolio-title {
-    font-size: 24px;
-    font-weight: 600;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 28px;
+    font-weight: 400; /* Вместо 600 */
     color: #ffffff;
     margin-bottom: 20px;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
 }
 
 .carousel-container {
@@ -425,7 +471,7 @@ select.form-control:focus {
    2. ORDER LIST PAGE (order_list.html)
    ======================================== */
 .orders-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 55px - 40px);
     padding-top: 120px;
     padding-bottom: 30px;
@@ -447,13 +493,15 @@ select.form-control:focus {
 }
 
 .orders-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 38px; /* Увеличено для элегантности */
+    font-weight: 400; /* Вместо 700 */
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 0;
+    letter-spacing: 3px;
 }
 
 .orders-title i {
@@ -515,17 +563,26 @@ select.form-control:focus {
 }
 
 .product-type,
+/* Order Type Badges */
 .order-type {
     display: inline-block;
-    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .order-type.template {
-    color: #8ab4f8;
+    background: rgba(66, 153, 225, 0.15);
+    border: 1px solid rgba(66, 153, 225, 0.4);
+    color: #4299e1;
 }
 
 .order-type.custom {
-    color: #f8b88a;
+    background: rgba(159, 122, 234, 0.15);
+    border: 1px solid rgba(159, 122, 234, 0.4);
+    color: #9f7aea;
 }
 
 .budget {
@@ -669,7 +726,7 @@ select.form-control:focus {
    3. ORDER DETAIL PAGE (order_detail.html)
    ======================================== */
 .order-detail-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -713,14 +770,17 @@ select.form-control:focus {
 }
 
 .detail-title {
-    font-size: 36px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 42px; /* Увеличено */
+    font-weight: 400; /* Вместо 700 */
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 15px;
     margin: 0;
+    letter-spacing: 3px;
 }
+
 
 .detail-title i {
     color: #d4af37;
@@ -1143,7 +1203,7 @@ select.form-control:focus {
    CONFIRM DELETE PAGE (order_confirm_delete.html)
    ======================================== */
 .confirm-delete-section {
-    background: #1D262B;
+    background: transparent;
     height: calc(100vh - 90px);
     padding-top: 120px;
     padding-bottom: 60px;
@@ -1303,7 +1363,7 @@ select.form-control:focus {
    DOCUMENTS LIST PAGE (document_list.html)
    ======================================== */
 .documents-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -1332,13 +1392,15 @@ select.form-control:focus {
 }
 
 .documents-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 38px;
+    font-weight: 400;
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 0;
+    letter-spacing: 3px;
 }
 
 .documents-title i {
@@ -1436,10 +1498,12 @@ select.form-control:focus {
 }
 
 .document-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 20px;
+    font-weight: 400;
     color: #ffffff;
     margin: 0 0 6px 0;
+    letter-spacing: 1px;
 }
 
 .document-date {
@@ -1677,7 +1741,7 @@ select.form-control:focus {
    CREATE ORDER PAGE (order_create.html) - NO SIDEBAR
    ======================================== */
 .create-order-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -1697,13 +1761,15 @@ select.form-control:focus {
 }
 
 .create-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 38px;
+    font-weight: 400;
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 10px 0 0 0;
+    letter-spacing: 3px;
 }
 
 .create-title i {
@@ -2106,10 +2172,12 @@ select {
 }
 
 .auth-title {
-    font-size: 28px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 32px;
+    font-weight: 400;
     color: #ffffff;
     margin: 0 0 8px 0;
+    letter-spacing: 2px;
 }
 
 .auth-subtitle {
@@ -2384,7 +2452,7 @@ select {
    ======================================== */
 
 .customers-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -2407,13 +2475,15 @@ select {
 }
 
 .customers-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 38px;
+    font-weight: 400;
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 0;
+    letter-spacing: 3px;
 }
 
 .customers-title i {
@@ -2550,15 +2620,16 @@ select {
 }
 
 .customer-name {
-    font-size: 20px;
-    font-weight: 600;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 22px;
+    font-weight: 400;
     color: #ffffff;
     margin: 0 0 8px 0;
     display: flex;
     align-items: center;
     gap: 10px;
+    letter-spacing: 1px;
 }
-
 .customer-name i {
     color: #d4af37;
     font-size: 22px;
@@ -2677,7 +2748,7 @@ select {
    ======================================== */
 
 .customer-orders-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -3268,7 +3339,7 @@ select {
 
 /* REPORT FORM PAGE */
 .report-form-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 60px;
@@ -3298,13 +3369,15 @@ select {
 }
 
 .report-form-title {
-    font-size: 28px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 32px;
+    font-weight: 400;
     color: #ffffff;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 12px;
+    letter-spacing: 2px;
 }
 
 .report-form-title i {
@@ -3459,7 +3532,7 @@ select {
 
 /* REPORT VIEW PAGE */
 .report-view-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 40px;
@@ -3489,13 +3562,15 @@ select {
 }
 
 .report-header-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 38px;
+    font-weight: 400;
     color: #ffffff;
     margin: 0 0 16px 0;
     display: flex;
     align-items: center;
     gap: 12px;
+    letter-spacing: 3px;
 }
 
 .report-header-title i {
@@ -3914,7 +3989,7 @@ select {
    ======================================== */
 
 .document-create-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 60px;
@@ -4243,7 +4318,7 @@ select {
    ======================================== */
 
 .document-update-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 120px;
     padding-bottom: 60px;
@@ -4480,7 +4555,7 @@ select {
    ======================================== */
 
 .document-delete-section {
-    background: #1D262B;
+    background: transparent;
     min-height: calc(100vh - 165px);
     padding-top: 140px;
     padding-bottom: 80px;
@@ -5203,4 +5278,11 @@ select {
 .btn-brief:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+
+.order-type.collection {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    color: #d4af37;
 }

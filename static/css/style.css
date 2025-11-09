@@ -2,9 +2,7 @@
    STYLE.CSS - ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ СТРАНИЦ
    ========================================== */
 
-/* ========================================
-   GLOBAL STYLES
-   ======================================== */
+/* GLOBAL STYLES */
 * {
     margin: 0;
     padding: 0;
@@ -19,18 +17,40 @@ html {
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1D262B;        /* Тот же цвет что у orders-section */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Для обычного текста */
+    background: linear-gradient(135deg, rgba(17, 17, 17, 0.97) 0%, rgba(45, 45, 45, 0.97) 100%),
+                url('../images/background_img.png');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #ffffff;
     overflow-x: hidden;
     min-height: 100vh;
-    height: 100%;               /* Добавлено */
+    height: 100%;
     position: relative;
     width: 100%;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+}
+
+/* Применяем Cormorant Garamond для всех заголовков */
+h1, h2, h3, h4, h5, h6,
+.hero-content h1,
+.orders-title,
+.detail-title,
+.customers-title,
+.documents-title,
+.create-title,
+.auth-title,
+.report-form-title,
+.report-header-title,
+.doc-header-title {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-weight: 400;
+    letter-spacing: 2px;
 }
 
 /* Main content area */

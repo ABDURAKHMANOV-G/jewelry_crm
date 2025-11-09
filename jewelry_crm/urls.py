@@ -17,4 +17,6 @@ urlpatterns = [
     
     # Orders
     path('orders/', include('orders.urls')),
+    
+    path('catalog/', include('catalog.urls')),
 ]

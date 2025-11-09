@@ -376,3 +376,41 @@ class DocumentUpdateForm(forms.ModelForm):
     class Meta:
         model = Document
         fields = ['document_date', 'amount', 'description']
+        
+class CollectionOrderForm(forms.ModelForm):
+    """Форма для заказа товара из коллекции"""
+    
+    SIZE_CHOICES = [
+        ('', 'Выберите размер'),
+        ('15', '15'),
+        ('16', '16'),
+        ('17', '17'),
+        ('18', '18'),
+        ('19', '19'),
+        ('20', '20'),
+        ('custom', 'Индивидуальный размер (укажите в комментарии)'),
+    ]
+    
+    ring_size = forms.ChoiceField(
+        choices=SIZE_CHOICES,
+        required=True,
+        label='Размер',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'id_ring_size'
+        })
+    )
+    
+    comment = forms.CharField(
+        required=False,
+        label='Комментарий',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Дополнительные пожелания или нестандартный размер...'
+        })
+    )
+    
+    class Meta:
+        model = Order
+        fields = ['ring_size', 'comment']
